@@ -33,9 +33,13 @@ export const dynamic = "force-dynamic";
 export function GET(request: Request): Response {
   const expected = process.env.HUB_TOKEN ?? "";
   if (!expected) {
+    // 503, pas 500 : sans jeton configuré, l'intégration hub est DÉSACTIVÉE — un état
+    // assumé, pas une erreur interne. C'est la convention de tous les consommateurs
+    // réels (BatchChef, DriveAI, JobAI — ADR-0001 de JobAI) ; le template était le
+    // seul à répondre 500.
     return Response.json(
-      { error: "HUB_TOKEN non configuré côté serveur." },
-      { status: 500, headers: NO_STORE },
+      { error: "hub désactivé : HUB_TOKEN non configuré côté serveur." },
+      { status: 503, headers: NO_STORE },
     );
   }
 

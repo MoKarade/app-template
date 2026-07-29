@@ -12,7 +12,8 @@ Tout le reste (l'interface, le moteur métier) se construit après le fork.
 - **No fake data.** Par défaut `status: "building"`, aucune métrique inventée. On ne
   publie de vrais chiffres que quand le moteur les produit réellement.
 - **Auth échec fermé.** `x-hub-token` obligatoire (401 sinon), `HUB_TOKEN` obligatoire
-  côté serveur (500 sinon). Comparaison en temps constant. Jamais de secret en dur.
+  côté serveur (503 sinon — hub désactivé, la convention de BatchChef, DriveAI et
+  JobAI). Comparaison en temps constant. Jamais de secret en dur.
 - **no-store systématique** sur les réponses du endpoint (un summary est un instantané).
 
 ## Au fork — checklist
@@ -25,8 +26,12 @@ Tout le reste (l'interface, le moteur métier) se construit après le fork.
 ## Vérifications avant commit
 
 ```bash
-npm run typecheck && npm run test && npm run build
+npm run typecheck && npm run lint && npm run test && npm run build
 ```
+
+*(`lint` = ESLint CLI : `next lint` est déprécié et retiré dans Next 16. Le bloc
+`ignores` de `eslint.config.mjs` est indispensable — l'ESLint CLI n'ignore pas
+`node_modules`/`.next` implicitement, contrairement à `next lint`.)*
 
 ## Style (hérité du CLAUDE.md global de Marc)
 
