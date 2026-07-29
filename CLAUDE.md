@@ -33,6 +33,13 @@ npm run typecheck && npm run lint && npm run test && npm run build
 `ignores` de `eslint.config.mjs` est indispensable — l'ESLint CLI n'ignore pas
 `node_modules`/`.next` implicitement, contrairement à `next lint`.)*
 
+La **CI** (`.github/workflows/ci.yml`) rejoue ce gate et part avec le fork — c'est
+voulu : les quatre apps nées de ce template ont démarré sans aucune vérification
+automatisée, et l'une a laissé vivre une injection SQL en production faute de quoi que
+ce soit qui se déclenche. Un job `audit` séparé (`npm audit --omit=dev`, aussi en
+hebdomadaire) complète le gate : un avis de sécurité paraît sans qu'une ligne n'ait
+changé, et mêlé au gate il peindrait un dépôt sain en rouge sans rapport avec le code.
+
 ## Style (hérité du CLAUDE.md global de Marc)
 
 - Réponses, commits et docs **en français** (`feat:`, `fix:`, `docs:`, …).
