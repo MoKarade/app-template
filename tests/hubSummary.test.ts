@@ -38,10 +38,10 @@ describe("hubTokenValid", () => {
 });
 
 describe("GET /hub/summary", () => {
-  it("500 si HUB_TOKEN non configuré, sans summary", async () => {
+  it("503 si HUB_TOKEN non configuré, sans summary — hub désactivé, pas erreur interne", async () => {
     await withHubToken(undefined, async () => {
       const res = GET(req({ [HUB_TOKEN_HEADER]: JETON }));
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(503);
       expect(await res.text()).not.toContain("contractVersion");
     });
   });
