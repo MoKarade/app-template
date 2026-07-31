@@ -8,6 +8,38 @@
 // « en construction », zéro chiffre inventé. AU FORK, quand ton moteur est prêt :
 // remplace `buildingSummary(APP, …)` par un vrai HubSummary construit sur tes données,
 // validé par HubSummarySchema.parse(...) avant d'être renvoyé.
+//
+// ⚠️ Cette route reste HORS du middleware d'authentification utilisateur : elle porte sa
+// propre auth par jeton. Voir l'en-tête de `lib/authGuard.ts` — c'est le piège n°1 de ce
+// template, vécu en production.
+//
+// ── CE QUE LE HUB FAIT DE TA RÉPONSE, ET CE QUE ÇA T'IMPOSE ──────────────────────────
+//
+// 1. IL POLLE VITE. Le hub rafraîchit toutes les ~15 s tant qu'un onglet est ouvert.
+//    Si produire ton summary coûte quelque chose de BORNÉ (exécution Apps Script, appel
+//    d'API tierce, requête lourde), METS UN CACHE COURT ICI — pas dans le hub, il ne peut
+//    pas savoir ce que ça te coûte. DriveAI a découvert que 19 polls sur 20 renvoyaient
+//    des octets identiques, chacun au prix d'une exécution comptée sur un quota DUR.
+//    Règle : si la donnée sous-jacente ne bouge qu'aux N minutes, un cache de N/5 dans ce
+//    handler ne perd aucune fraîcheur et divise la facture d'autant. Ne JAMAIS mettre en
+//    cache une PANNE — un échec doit rester observable et le prochain appel doit réessayer.
+//
+// 2. IL AFFICHE `dataAsOf`, PAS `generatedAt`. `generatedAt` = quand tu as fabriqué la
+//    réponse (toujours « maintenant »). `dataAsOf` = quand la DONNÉE a été rafraîchie pour
+//    la dernière fois. Si ton moteur tourne par tick, publie `dataAsOf` : sans lui, le hub
+//    ne peut pas distinguer « à jour » de « figé depuis trois jours ».
+//
+// 3. IL SOMME LES COÛTS PAR PÉRIODE. Le bloc `usage` (contrat v1.1) porte
+//    `cost: { amount, currency, period }` avec period = 'total' | 'mois' | 'jour'.
+//    ⚠️ Le hub ne fusionne JAMAIS deux périodes différentes (il l'a fait, ça produisait un
+//    montant qui n'existe pas). Choisis `total` (cumul depuis toujours) sauf raison
+//    explicite : c'est ce que publient BatchChef et FinanceAI, donc leurs coûts s'agrègent
+//    entre eux. Une app qui publie `mois` apparaîtra dans un total séparé.
+//    Si tu n'as AUCUN coût réel à publier, n'envoie PAS de bloc `usage` : l'app s'affiche
+//    « non suivie », ce qui est honnête. Un `amount: 0` inventé serait de la fausse donnée.
+//
+// 4. IL RENDS TES `href` VIA UN FILTRE. Seuls http/https deviennent cliquables. Publie des
+//    URLs absolues.
 
 import {
   HUB_TOKEN_HEADER,
