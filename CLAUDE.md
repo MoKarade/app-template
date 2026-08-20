@@ -3,8 +3,8 @@
 Squelette d'app de l'écosystème hub perso. Deux responsabilités génériques, déjà branchées :
 exposer `GET /hub/summary` conforme à
 [`@mokarade/hub-contract`](https://github.com/MoKarade/hub-contract), et rester **privée**
-(login Google, une seule adresse). Tout le reste — l'interface, le moteur métier — se
-construit après le fork.
+(login Google + autorisation centralisée dans le hub). Tout le reste — l'interface, le
+moteur métier — se construit après le fork.
 
 > **Ce fichier condense ce que les cinq apps de l'écosystème ont appris en production**
 > (Hubperso, FinanceAI, DriveAI, BatchChef, JobAI). Chaque avertissement marqué ⚠️ vient
@@ -23,9 +23,28 @@ construit après le fork.
   → 503 (intégration désactivée, pas une panne) ; auth utilisateur non configurée → 503 et
   rien n'est servi. Comparaisons de jetons en **temps constant**. Jamais de secret en dur.
 - **`no-store` systématique** sur `/hub/summary` : un summary est un instantané.
-- **App privée par défaut.** Elle affiche des données personnelles → login Google
-  mono-adresse (`AUTHORIZED_EMAIL`) + middleware fail-closed. Toute NOUVELLE route qui
-  affiche des données reste DERRIÈRE le middleware.
+- **App privée par défaut.** Elle affiche des données personnelles → login Google +
+  middleware fail-closed. Toute NOUVELLE route qui affiche des données reste DERRIÈRE le
+  middleware.
+- **Qui a le droit d'entrer : DEUX ÉTAGES, pas un seul** (ADR 0001 du hub).
+  `AUTHORIZED_EMAIL` **n'est PAS « la seule adresse admise »** — c'est le **propriétaire**,
+  vérifié en premier et **sans réseau**, pour qu'une panne du hub ne puisse pas enfermer
+  Marc dehors de sa propre app. Tout le monde d'autre passe par `aAccesHub`
+  (`lib/accesHub.ts`), qui interroge la table `acces` du hub via `POST /api/acces` avec le
+  `HUB_TOKEN` déjà en place — aucun nouveau secret.
+
+  Conséquence pratique : **inviter quelqu'un se fait depuis `hubperso.com/administration`**,
+  pas en éditant une variable Vercel dans chaque app. Ne jamais rajouter une allowlist
+  locale « en attendant » : elle deviendrait une seconde source de vérité, et personne ne
+  penserait à l'y retirer le jour de la révocation.
+- **Le contrôle est REJOUÉ, pas fait une fois.** `signIn` ne tourne qu'à la connexion, et
+  le cookie de session est partagé entre les sous-domaines de `hubperso.com` : sans plus,
+  l'app accepterait une session fabriquée par une autre app du hub. Le callback `jwt`
+  revérifie donc à **chaque lecture** et renvoie `null` sinon. C'est ce qui rend la
+  révocation réelle — retirer un accès mord dans la minute, sans déconnexion.
+- **Un refus ne se met JAMAIS en cache.** Le cache d'`aAccesHub` ne mémorise que les OUI,
+  60 s. Mémoriser un NON ferait attendre une minute quelqu'un qu'on vient tout juste
+  d'ajouter — précisément à l'instant où l'on vérifie que ça marche.
 
 ## Les deux pièges qui ont coûté cher
 

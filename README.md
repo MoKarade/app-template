@@ -7,9 +7,10 @@ d'ici. Deux choses sont déjà branchées et testées :
    [`@mokarade/hub-contract`](https://github.com/MoKarade/hub-contract), avec auth
    `x-hub-token` en temps constant — l'app apparaît dans le hub dès le premier déploiement,
    honnêtement « en construction » (`buildingSummary`).
-2. **Un login Google mono-adresse** (Auth.js v5) + middleware **fail-closed** — parce que
-   ces apps affichent des données personnelles réelles, et que les quatre apps existantes
-   ont toutes fini par avoir besoin exactement de ça.
+2. **Un login Google** (Auth.js v5) + middleware **fail-closed**, avec l'autorisation
+   centralisée dans le hub (`lib/accesHub.ts`) — parce que ces apps affichent des données
+   personnelles réelles, et que les apps existantes ont toutes fini par avoir besoin
+   exactement de ça.
 
 > Ce template condense ce que **Hubperso, FinanceAI, DriveAI, BatchChef et JobAI** ont
 > appris en production. Les avertissements ⚠️ viennent de vrais bugs.
@@ -20,7 +21,9 @@ d'ici. Deux choses sont déjà branchées et testées :
 |---|---|
 | `app/hub/summary/route.ts` | Endpoint du hub : 503 sans `HUB_TOKEN`, 401 sans jeton valide, `no-store`, summary `building` |
 | `lib/hubToken.ts` | Comparaison de jeton en temps constant (SHA-256 + `timingSafeEqual`) |
-| `auth.ts` | Auth.js v5, Google, **une seule** adresse admise (`AUTHORIZED_EMAIL`) |
+| `auth.ts` | Auth.js v5, Google. **Deux étages** : le propriétaire (`AUTHORIZED_EMAIL`, sans réseau) puis le hub. Revérifié à chaque lecture de session |
+| `lib/accesHub.ts` | `POST /api/acces` vers le hub, cache 60 s **positifs seulement**, échec fermé |
+| `lib/sessionPartagee.ts` | Cookie de session sur `.hubperso.com` → connexion unique entre les apps |
 | `middleware.ts` | Garde global fail-closed ; exclut `/hub/summary` (auth par jeton) |
 | `lib/authGuard.ts` | Décision de garde en fonctions **pures**, testables |
 | `lib/authConfigured.ts` | Refuse tout si `AUTH_SECRET`/`AUTHORIZED_EMAIL` manquent |
@@ -57,6 +60,10 @@ des octets identiques, chacun facturé sur un quota dur. Ne jamais mettre une **
 4. **Déclarer l'app au hub** : entrée dans `lib/sources.ts` du repo Hubperso + variable
    `HUB_TOKEN_<ID>`. ⚠️ C'est du **code** côté hub → redéploiement du hub nécessaire, pas
    seulement une variable d'environnement.
+   Cette entrée fait DEUX choses : elle affiche le widget de l'app, **et** elle la fait
+   apparaître dans `hubperso.com/administration` (`APPS_DISPONIBLES` dérive de
+   `SOURCE_DEFS`). Sans elle, personne ne peut se voir accorder l'accès à la nouvelle app
+   — seul le propriétaire entrerait, et ça ressemblerait à un bug d'autorisation.
 5. **Construire l'app.** Quand le moteur produit de vraies données, remplacer
    `buildingSummary(APP, …)` par un vrai `HubSummary`, validé par `validateSummary(...)`.
 6. **Si l'app a une base** : voir « Migrations » plus bas.
@@ -69,7 +76,8 @@ Deux authentifications indépendantes, qui ne se recouvrent pas :
 | | Qui | Mécanisme | Échec |
 |---|---|---|---|
 | **Hub → app** | le hub, server-side | header `x-hub-token` | 503 si `HUB_TOKEN` absent, 401 si invalide |
-| **Toi → app** | navigateur | Google OAuth, 1 adresse | 503 si non configurée, redirection `/login` sinon |
+| **Toi → app** | navigateur | Google OAuth, puis autorisation demandée au hub | 503 si non configurée, redirection `/login` sinon |
+| **App → hub** | l'app, server-side | `POST /api/acces` avec le même `HUB_TOKEN` | `false` (échec fermé) — sauf le propriétaire, qui ne passe pas par là |
 
 ```bash
 # jeton du hub
@@ -81,6 +89,16 @@ npx auth secret
 ⚠️ **Fail-closed voulu** : sans `AUTH_SECRET`/`AUTHORIZED_EMAIL`, le middleware répond 503 et
 ne sert RIEN. Auth.js seul se contente de logguer `MissingSecret` et **laisse passer** —
 constaté en préproduction sur le hub, qui servait ses données sans login.
+
+⚠️ **`AUTHORIZED_EMAIL` est le PROPRIÉTAIRE, pas une allowlist.** Il ouvre tout, toujours,
+et **sans toucher au réseau** : c'est l'échappatoire qui garantit qu'une panne du hub ne
+t'enferme pas dehors de ta propre app. Les autres personnes vivent dans la table `acces` du
+hub et se gèrent depuis `hubperso.com/administration` — jamais en éditant une variable ici.
+
+⚠️ **`AUTH_SECRET` doit être IDENTIQUE dans toutes les apps du hub**, et
+`AUTH_COOKIE_DOMAIN=.hubperso.com` ne se pose **qu'en production** : un cookie portant ce
+domaine est rejeté sur `localhost` et sur `<projet>.vercel.app`, et il l'est
+**silencieusement** — on retombe sur `/login` en boucle, sans erreur nulle part.
 
 ## Migrations : rien à lancer sur ton PC
 
@@ -117,11 +135,22 @@ Avant chaque commit : `npm run typecheck && npm run lint && npm run test && npm 
 ## Déploiement
 
 Vercel (ou tout hôte Next.js). Définir `HUB_TOKEN`, `AUTH_SECRET`, `AUTHORIZED_EMAIL`,
-`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. Domaine cible : `<nom>.hubperso.com`.
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, et en **production seulement**
+`AUTH_COOKIE_DOMAIN=.hubperso.com`. Domaine cible : `<nom>.hubperso.com` — et pas une
+adresse en `.vercel.app` : un cookie ne franchit pas la frontière entre deux domaines, donc
+la connexion unique ne marcherait pas.
+
+`AUTH_SECRET` doit être **la même valeur que dans les autres apps du hub**. Avec un secret
+différent, l'app reçoit bien le cookie partagé mais n'arrive pas à le déchiffrer : elle
+renvoie sur `/login`, l'utilisateur se reconnecte, et ça recommence.
 
 Redirect URIs à déclarer côté Google Cloud :
 `http://localhost:3000/api/auth/callback/google` et
 `https://<nom>.hubperso.com/api/auth/callback/google`.
+
+Chaque app garde **son propre** client OAuth. Le projet à client unique a été envisagé puis
+abandonné (voir l'amendement de l'ADR 0001 du hub) : ce qui est centralisé, c'est
+l'**autorisation**, pas l'authentification Google.
 
 ## Version du contrat
 
