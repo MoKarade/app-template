@@ -6,12 +6,20 @@ exposer `GET /hub/summary` conforme à
 (login Google + autorisation centralisée dans le hub). Tout le reste — l'interface, le
 moteur métier — se construit après le fork.
 
+**Stack** : Next.js 15 (App Router) · Auth.js v5 · TypeScript strict · Vitest.
+**Destination** : `<nom>.hubperso.com`.
+
+> 📐 Structure de ce fichier et de `docs/` : [convention commune aux huit dépôts](https://github.com/MoKarade/claude-config/blob/main/conventions/STRUCTURE-DEPOT.md).
+> Elle est écrite là et nulle part ailleurs.
+
 > **Ce fichier condense ce que les cinq apps de l'écosystème ont appris en production**
 > (Hubperso, FinanceAI, DriveAI, BatchChef, JobAI). Chaque avertissement marqué ⚠️ vient
 > d'un vrai bug, pas d'une précaution théorique. Ce que ce fichier oublie, chaque fork
 > l'oubliera.
+>
+> **Au fork, commence par la section 11.**
 
-## Principes non négociables
+## 1. Principes non négociables
 
 - **Contrat d'abord.** Toute réponse de `/hub/summary` passe par le schéma du contrat
   (`buildingSummary` le garantit ; au fork, `validateSummary(...)` sur un vrai summary).
@@ -46,52 +54,41 @@ moteur métier — se construit après le fork.
   60 s. Mémoriser un NON ferait attendre une minute quelqu'un qu'on vient tout juste
   d'ajouter — précisément à l'instant où l'on vérifie que ça marche.
 
-## Les deux pièges qui ont coûté cher
+## 2. Conventions de code
 
-**1. `/hub/summary` doit rester HORS du middleware d'auth utilisateur.**
-Il porte sa propre auth (le jeton). S'il tombe sous le garde de session, le hub reçoit une
-redirection HTML vers `/login` au lieu du JSON → widget « injoignable » en permanence.
-Le symptôme est trompeur : l'app marche parfaitement dans ton navigateur (tu es connecté),
-seul le hub voit le problème. Vécu par JobAI, qui l'a appelé « le défaut n°1 du squelette ».
-Verrouillé par `tests/auth.test.ts` — ne pas supprimer ce test.
+- **TypeScript strict**, pas de `any` silencieux.
+- **Erreurs honnêtes** : ne pas avaler une exception, ne pas ajouter un `try/catch` qui
+  cache un vrai bug. Chaque mode d'échec se distingue des autres.
+- **Fonctions pures d'un côté, I/O de l'autre.** Ce qui décide se teste sans base, sans
+  réseau et sans horloge — la date et les lectures se passent en paramètre.
+- **Nommage clair plutôt que commentaires verbeux** ; mais un commentaire qui explique
+  POURQUOI (surtout un piège) vaut son poids.
+- **Planchers de version, jamais redescendus** : documenter dans `package.json` (clé `//`)
+  toute version minimale imposée par une faille — ex. `drizzle-orm ≥ 0.45.2`
+  (GHSA-gpj5-g38j-94v9, injection SQL, HIGH) chez BatchChef.
+- Ne pas imposer le dark mode : `prefers-color-scheme` décide.
 
-**2. Le hub polle toutes les ~15 s, et il ne peut pas deviner ce que ça te coûte.**
-Si produire ton summary consomme une ressource BORNÉE (exécution Apps Script, appel d'API
-tierce, requête lourde), mets un **cache court dans ton handler**. DriveAI a découvert que
-19 polls sur 20 renvoyaient des octets identiques, chacun facturé sur un quota dur de
-90 min/jour partagé avec son moteur. Règle : si la donnée ne bouge qu'aux N minutes, un
-cache de ~N/5 ne perd aucune fraîcheur. ⚠️ Ne JAMAIS mettre une **panne** en cache — un
-échec doit rester observable et le prochain appel doit réessayer.
+## 3. Workflow git
 
-## Publier au hub — ce qui compte
+- Branches `claude/<slug>` pour le travail automatisé, `feature/<slug>` pour Marc.
+- Commits en français, préfixés (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
+- **PR en draft** pour itérer.
+- ❌ Jamais `--force` sur `main`. ❌ Jamais `--no-verify`.
+- ⚠️ **`git fetch origin main` AVANT de committer.** Plusieurs sessions peuvent travailler
+  en parallèle sur le même dépôt ; le 20/08/2026, deux d'entre elles ont produit la même
+  correction de CI, mot pour mot, dans la même heure.
 
-- **`dataAsOf` ≠ `generatedAt`.** `generatedAt` = quand tu as fabriqué la réponse (toujours
-  « maintenant »). `dataAsOf` = quand la DONNÉE a été rafraîchie. Sans lui, le hub ne peut
-  pas distinguer « à jour » de « figé depuis trois jours ».
-- **Période des coûts** (`usage.cost.period`) : le hub ne fusionne **jamais** deux périodes
-  différentes — il l'a fait, ça produisait un montant qui n'existait pas. Choisir `total`
-  sauf raison explicite : c'est ce que publient BatchChef et FinanceAI, donc les coûts
-  s'agrègent entre eux. `mois` apparaîtra dans un total séparé.
-- **Un champ additif optionnel ne casse rien.** Les schémas strippent les clés inconnues :
-  un producteur peut publier `usage` avant que tous les consommateurs ne soient re-pinnés.
-- **Le hub ne connaît aucune app en particulier.** Il rend ce que le summary contient. Si tu
-  veux quelque chose de spécifique à l'écran, ça passe par le contrat, pas par du code hub.
+## 4. Commandes utiles
 
-## Au fork — checklist
+```bash
+npm run dev        # serveur de développement
+npm run test       # vitest
+npm run typecheck  # tsc --noEmit
+npm run lint       # eslint .
+npm run build      # build de production
+```
 
-1. Personnaliser `APP` (id/name/url/color) dans `app/hub/summary/route.ts`. L'`id` doit
-   correspondre EXACTEMENT à l'entrée de `lib/sources.ts` côté Hubperso.
-2. Configurer l'environnement (cf. `.env.example`) : `HUB_TOKEN`, `AUTH_SECRET`,
-   `AUTHORIZED_EMAIL`, `GOOGLE_CLIENT_ID/SECRET`.
-3. Déclarer l'app dans `lib/sources.ts` du hub + la variable `HUB_TOKEN_<ID>`.
-   ⚠️ C'est du **code** côté hub → ça exige un redéploiement du hub, pas juste une variable.
-4. Remplacer `buildingSummary(...)` par un vrai summary quand le moteur produit des données.
-5. **Si l'app a une base** : ajouter `"vercel-build": "npm run db:migrate && next build"`
-   (Vercel l'utilise à la place de `build` quand il existe) OU appliquer les migrations au
-   démarrage. Exigence de Marc : **ne jamais avoir à lancer une commande sur son PC**.
-6. Tenir `HANDOVER.md` (état courant, à lire en premier) et `BACKLOG.md` dès la 1ʳᵉ session.
-
-## Vérifications avant commit
+## 5. Vérifications avant commit
 
 ```bash
 npm run typecheck && npm run lint && npm run test && npm run build
@@ -108,25 +105,119 @@ Un job `audit` **séparé** (`npm audit --omit=dev`, aussi en hebdomadaire) comp
 un avis de sécurité paraît sans qu'une ligne n'ait changé, et mêlé au gate il peindrait un
 dépôt sain en rouge sans rapport avec le code — c'est ainsi qu'une CI cesse d'être lue.
 
-## Documentation
+⚠️ **Borner les jobs CI** (`timeout-minutes`). Sans plafond, un job figé tourne SIX HEURES
+avant d'échouer — vécu sur DriveAI le 19/08/2026, où l'installation d'un navigateur
+Playwright s'est bloquée 2 h 15 pendant que la PR restait « en attente » sans rien de rouge.
 
-- `CLAUDE.md` (ce fichier) se charge à **chaque session** → il reste **court**. ⚠️ Leçon
-  FinanceAI : le sien avait atteint 1 777 lignes (~36 500 tokens par session) tout en
-  affirmant être « dense et court ». Les leçons détaillées vont dans `docs/`, jamais ici.
-- `HANDOVER.md` — état courant, à lire en premier à chaque reprise.
-- `BACKLOG.md` — tâches. ⚠️ Un item peut être **périmé** (réglé ailleurs) : vérifier l'état
-  réel avant de coder.
-- ⚠️ **Doc périmée = pire que pas de doc.** Le README de JobAI a annoncé « rien n'est
-  déployé » pendant des semaines alors que l'app tournait avec des données réelles — et
-  promettait en même temps une fonctionnalité IA qui n'existait pas. Mettre à jour la doc
-  touchée dans la MÊME PR que le code.
+## 6. Après un merge : vérifier le DÉPLOIEMENT, pas seulement la CI
 
-## Style (hérité du CLAUDE.md global de Marc)
+**CI verte ne veut pas dire « en ligne ».** Ce sont deux systèmes indépendants : la CI juge
+le code, Vercel construit et sert. Un merge peut passer le gate et ne jamais être déployé —
+la branche reste verte, le site continue de servir l'ancien build, et rien n'est rouge nulle
+part.
 
-- Réponses, commits et docs **en français** (`feat:`, `fix:`, `docs:`, …). Pas d'emojis
-  dans le chat sauf demande explicite.
-- TypeScript strict, pas de `any` silencieux. Erreurs honnêtes, jamais avalées.
-- Ne pas imposer le dark mode : `prefers-color-scheme` décide.
-- **Planchers de version, jamais redescendus** : documenter dans `package.json` (clé `//`)
-  toute version minimale imposée par une faille — ex. `drizzle-orm ≥ 0.45.2`
-  (GHSA-gpj5-g38j-94v9, injection SQL, HIGH) chez BatchChef.
+Vécu le 31/07/2026 : quatre projets Vercel ont cessé de créer des déploiements pendant ~3 h.
+DriveAI et JobAI ont rattrapé au push suivant ; Hubperso et BatchChef n'en ont pas eu — leur
+commit d'en-têtes de sécurité est resté **cinq jours** en attente sans que personne ne le
+voie.
+
+Donc, après un merge qui change ce qui est SERVI (en-têtes, `next.config.mjs`, middleware,
+variables de build, routes) : vérifier qu'un déploiement de production a bien été créé et
+qu'il est `READY`, puis **contrôler l'effet sur la réponse réelle** — un en-tête se lit dans
+la réponse, il ne se déduit pas du fichier source.
+
+Corollaire : un merge qui ne change QUE de la doc n'a pas de déploiement à vérifier. Le dire
+plutôt que de laisser croire qu'on a vérifié.
+
+## 7. Intégration hub
+
+- **`dataAsOf` ≠ `generatedAt`.** `generatedAt` = quand tu as fabriqué la réponse (toujours
+  « maintenant »). `dataAsOf` = quand la DONNÉE a été rafraîchie. Sans lui, le hub ne peut
+  pas distinguer « à jour » de « figé depuis trois jours ».
+- **Période des coûts** (`usage.cost.period`) : le hub ne fusionne **jamais** deux périodes
+  différentes — il l'a fait, ça produisait un montant qui n'existait pas. Choisir `total`
+  sauf raison explicite : c'est ce que publient FinanceAI, BatchChef, DriveAI et JobAI, donc
+  les coûts s'agrègent entre eux. `mois` isolerait l'app dans une colonne à part.
+- **`HUB_TOKEN` sert dans LES DEUX SENS.** Entrant : le hub le présente pour lire le summary.
+  **Sortant** : l'app le présente au hub sur `POST /api/acces`. C'est lui qui IDENTIFIE l'app
+  côté hub, donc aucun `appId` n'est envoyé dans le corps — sinon une app pourrait interroger
+  les accès d'une autre.
+- **Un champ additif optionnel ne casse rien.** Les schémas strippent les clés inconnues :
+  un producteur peut publier `usage` avant que tous les consommateurs ne soient re-pinnés.
+- **Le hub ne connaît aucune app en particulier.** Il rend ce que le summary contient. Si tu
+  veux quelque chose de spécifique à l'écran, ça passe par le contrat, pas par du code hub.
+
+## 8. Documentation (où vit quoi)
+
+| Fichier | Contenu |
+|---|---|
+| `README.md` | À quoi sert l'app, pour un lecteur extérieur. |
+| `CLAUDE.md` | Ce fichier. Se charge à **chaque session** → il reste **court**. |
+| `HANDOVER.md` | L'état RÉEL : ce qui tourne, ce qui reste à poser. À lire en premier. |
+| `BACKLOG.md` | Ce qui est décidé mais pas fait. |
+| `docs/adr/` | Décisions architecturales, `NNNN-slug.md`. |
+| `docs/*.md` | Documents thématiques. Les leçons détaillées vont ici, jamais dans `CLAUDE.md`. |
+
+⚠️ **Leçon FinanceAI** : son `CLAUDE.md` avait atteint 1 777 lignes (~36 500 tokens par
+session) tout en affirmant être « dense et court ».
+
+⚠️ **Doc périmée = pire que pas de doc.** Le README de JobAI a annoncé « rien n'est déployé »
+pendant des semaines alors que l'app tournait avec des données réelles — et promettait en
+même temps une fonctionnalité IA qui n'existait pas. Mettre à jour la doc touchée dans la
+MÊME PR que le code.
+
+⚠️ **Un chiffre au présent rote.** « 813 tests », « frein à 110 $ », « la campagne est
+finie » : personne ne les relit et rien ne signale qu'ils sont devenus faux. Soit on les
+date, soit on renvoie à la source qui fait foi.
+
+## 9. Leçons apprises
+
+**1. `/hub/summary` doit rester HORS du middleware d'auth utilisateur.**
+Il porte sa propre auth (le jeton). S'il tombe sous le garde de session, le hub reçoit une
+redirection HTML vers `/login` au lieu du JSON → widget « injoignable » en permanence.
+Le symptôme est trompeur : l'app marche parfaitement dans ton navigateur (tu es connecté),
+seul le hub voit le problème. Vécu par JobAI, qui l'a appelé « le défaut n°1 du squelette ».
+Verrouillé par `tests/auth.test.ts` — ne pas supprimer ce test.
+
+**2. Le hub polle toutes les ~15 s, et il ne peut pas deviner ce que ça te coûte.**
+Si produire ton summary consomme une ressource BORNÉE (exécution Apps Script, appel d'API
+tierce, requête lourde), mets un **cache court dans ton handler**. DriveAI a découvert que
+19 polls sur 20 renvoyaient des octets identiques, chacun facturé sur un quota dur de
+90 min/jour partagé avec son moteur. Règle : si la donnée ne bouge qu'aux N minutes, un
+cache de ~N/5 ne perd aucune fraîcheur. ⚠️ Ne JAMAIS mettre une **panne** en cache — un
+échec doit rester observable et le prochain appel doit réessayer.
+
+**3. Un `undefined` dans une addition empoisonne TOUT le cumul.** `undefined + nombre` donne
+`NaN`, et un seul suffit à rendre faux un total entier, pas seulement la valeur concernée.
+Normaliser les champs absents à `0` à l'ENTRÉE. Vécu par DriveAI sur un JSON antérieur à un
+changement de format.
+
+**4. Une donnée illisible se COMPTE, elle ne se rabat pas sur zéro.** Un cumul discrètement
+amputé est pire qu'une erreur visible : il se présente comme une mesure.
+
+## 10. Style (hérité du CLAUDE.md global de Marc)
+
+- Réponses, commits et docs **en français**. Pas d'emojis dans le chat sauf demande explicite.
+- Ton direct, technique mais clair. Pas de flatterie.
+- Explications concrètes plutôt que théorie abstraite.
+
+## 11. Au fork — checklist
+
+1. Personnaliser `APP` (id/name/url/color) dans `app/hub/summary/route.ts`. L'`id` doit
+   correspondre EXACTEMENT à l'entrée de `lib/sources.ts` côté Hubperso.
+2. Configurer l'environnement (cf. `.env.example`) : `HUB_TOKEN`, `AUTH_SECRET`,
+   `AUTHORIZED_EMAIL`, `GOOGLE_CLIENT_ID/SECRET`, et en **production seulement**
+   `AUTH_COOKIE_DOMAIN=.hubperso.com`.
+   ⚠️ `AUTH_SECRET` doit être **identique** à celui du hub, sinon l'app reçoit le cookie
+   partagé sans pouvoir le déchiffrer — et la connexion boucle sans message d'erreur.
+3. Déclarer l'app dans `lib/sources.ts` du hub + la variable `HUB_TOKEN_<ID>`.
+   ⚠️ C'est du **code** côté hub → ça exige un redéploiement du hub, pas juste une variable.
+   Cette entrée fait DEUX choses : elle affiche le widget, **et** elle rend l'app
+   attribuable dans `hubperso.com/administration`. Sans elle, personne ne peut recevoir
+   l'accès — et ça ressemble à un bug d'autorisation.
+4. Remplacer `buildingSummary(...)` par un vrai summary quand le moteur produit des données.
+5. **Si l'app a une base** : ajouter `"vercel-build": "npm run db:migrate && next build"`
+   (Vercel l'utilise à la place de `build` quand il existe) OU appliquer les migrations au
+   démarrage. Exigence de Marc : **ne jamais avoir à lancer une commande sur son PC**.
+6. Créer `HANDOVER.md` et `BACKLOG.md` dès la première session, et `docs/adr/` à la première
+   décision architecturale.
