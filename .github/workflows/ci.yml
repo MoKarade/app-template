@@ -27,6 +27,9 @@ permissions:
 
 jobs:
   gate:
+    # Plafond : sans lui, un job fige tourne SIX HEURES avant d'echouer (vecu sur
+    # DriveAI le 19/08/2026). Calibre sur la duree reelle — 1 min 03 s observe.
+    timeout-minutes: 15
     name: Gate (typecheck · lint · tests · build)
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
@@ -68,6 +71,9 @@ jobs:
         run: npm run build
 
   audit:
+    # Plafond : sans lui, un job fige tourne SIX HEURES avant d'echouer (vecu sur
+    # DriveAI le 19/08/2026). Calibre sur la duree reelle — 37 s observe.
+    timeout-minutes: 10
     name: Audit des dépendances de production
     runs-on: ubuntu-latest
     # Job SÉPARÉ du gate, volontairement : un avis de sécurité paraît sans qu'aucun
