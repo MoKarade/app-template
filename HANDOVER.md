@@ -35,3 +35,30 @@ ait qu'un exemplaire.
   — l'arborescence et le squelette de `CLAUDE.md`, communs aux huit dépôts.
 - [ADR 0001 de Hubperso](https://github.com/MoKarade/Hubperso/blob/main/docs/adr/) — le
   modèle d'accès (connexion unique, autorisation par app).
+
+## Portes qualité de l'Atelier (S6, 23/09/2026)
+
+Contrôles automatiques en CI, jobs **Qualité** et **Sécurité** : la fusion automatique les attend.
+Principe du **cliquet** : `qualite/seuils.json` fige l'état du jour de la mise en place ; rien ne peut
+reculer. `npm run portes` mesure en local, `npm run portes:maj` resserre après une amélioration.
+
+| Porte | Seuil de départ |
+|---|---|
+| Typage (erreurs) | ≤ 0 |
+| Lint (erreurs) | ≤ 0 |
+| Lint (avertissements) | ≤ 2 |
+| Tests en échec | ≤ 0 |
+| Couverture `lib/` (% lignes) | ≥ 69.4 |
+| Couverture globale (% lignes) | ≥ 48.9 |
+| Couverture globale (% branches) | ≥ 94.2 |
+| Code mort (knip) | ≤ 3 |
+| Règles d'architecture (dependency-cruiser) | ≤ 0 |
+
+Sécurité : gitleaks sur l'historique qui serait fusionné (HEAD) + Semgrep (TypeScript, React, Next.js,
+secrets, OWASP), bloquants.
+Dependabot : mises à jour hebdomadaires (npm + actions), fusion automatique si tout est vert.
+
+**Au fork.** Les seuils ci-dessus sont ceux du SQUELETTE : le cliquet s'applique dès la première PR de
+l'app — c'est voulu, une app neuve naît testée. Si le fork change de structure (pas de `lib/`, un
+dossier `components/` qui apparaît), ajuster le bloc `config` de `qualite/seuils.json` (`coeur`,
+`archi`) ; desserrer un seuil reste une décision de Marc (`--forcer`).
