@@ -31,6 +31,15 @@ on:
     workflows: ["*"]
   pull_request_target:
     types: [ready_for_review]
+  # ── LE RETOUR DE VERCEL ─────────────────────────────────────────────────────────────
+  #
+  # Vercel publie un STATUT de commit, pas un workflow : sa fin ne déclenche aucun
+  # `workflow_run`. Une PR dont la CI finit AVANT le déploiement de prévisualisation
+  # (« pas de merge : Vercel en cours ») n'avait plus que la passe planifiée — et GitHub
+  # espace en réalité ce cron « toutes les 30 min » de 4 à 5 h (mesuré le 23/09/2026 sur
+  # CarAI : 00:46, 05:22, 10:10, 15:07, 19:07 Z ; #138 à #140 vertes, restées ouvertes).
+  # `status` réveille l'examen dès qu'un statut passe au vert (filtré dans le `if:`).
+  status:
   # ── LA PASSE DE RATTRAPAGE, ET C'EST ELLE QUI REND L'ENSEMBLE FIABLE ───────────────
   #
   # `workflow_run` NE SE REJOUE JAMAIS. Un appel d'API bloqué par la limite de débit GitHub,
@@ -40,10 +49,13 @@ on:
   # Elle rattrape aussi le RETOUR DU QUOTA VERCEL : une PR bloquée hier parce que le plafond
   # du compte était atteint repart d'elle-même le lendemain, sans que personne n'y touche.
   #
-  # Toutes les 30 minutes : assez pour ne rien laisser traîner une demi-journée, assez rare
-  # pour ne pas peser sur le quota d'Actions.
+  # UNE FOIS PAR JOUR (décision de Marc, 23/09/2026). Le « */30 » d'avant n'a jamais existé :
+  # GitHub l'espaçait de 4 à 5 h (mesuré sur CarAI), et chaque passage coûte au moins une minute
+  # d'Actions sur un dépôt privé — 2 000 min/mois en tout, épuisées le 23/09, auto-merge = 26 %
+  # de la consommation. Le réveil principal est événementiel : `workflow_run` (fin de CI) et
+  # `status` (fin du déploiement Vercel). Ceci n'est plus qu'un filet quotidien (05:23 à Québec).
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "23 9 * * *"
   # Pour pouvoir la déclencher à la main quand on veut débloquer tout de suite.
   workflow_dispatch:
 
@@ -105,6 +117,7 @@ jobs:
     if: >
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'status' && github.event.state == 'success') ||
       github.event_name == 'pull_request_target' ||
       (github.event.workflow_run.event == 'pull_request' &&
        github.event.workflow_run.head_repository.full_name == github.repository)
