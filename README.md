@@ -28,8 +28,9 @@ d'ici. Deux choses sont déjà branchées et testées :
 | `lib/authGuard.ts` | Décision de garde en fonctions **pures**, testables |
 | `lib/authConfigured.ts` | Refuse tout si `AUTH_SECRET`/`AUTHORIZED_EMAIL` manquent |
 | `app/login/page.tsx` | Page publique, messages d'erreur honnêtes et distincts |
-| `tests/` | 17 tests : contrat + garde d'accès |
-| `.github/workflows/ci.yml` | Gate (typecheck · lint · test · build) + job `audit` séparé |
+| `tests/` | Contrat, garde d'accès, accès hub, décision d'auto-merge (le compte fait foi : `npm run test`) |
+| `.github/workflows/ci.yml` | Gate (typecheck · lint · test · build) + job `audit` séparé, portes qualité et sécurité |
+| `.github/workflows/auto-merge.yml` + `scripts/autoMerge.mjs` | Auto-merge maison : fusionne une PR non brouillon dont les contrôles sont verts (décision pure, testée) |
 
 ## ⚠️ Les deux pièges à ne pas rejouer
 
@@ -154,7 +155,8 @@ l'**autorisation**, pas l'authentification Google.
 
 ## Version du contrat
 
-`@mokarade/hub-contract` est épinglé sur un **SHA**, pas un tag : le tag `v1.1.0` n'a jamais
-pu être poussé (proxy git, 403 sur les refs de tag). Les cinq dépôts de l'écosystème épinglent
-le **même** SHA `2d37a61…` = contenu v1.1.0 (bloc `usage` additif). Ne pas redescendre à
-`#v1.0.0`, qui ignore ce bloc.
+Au 14/10/2026 (`package.json`) : `@mokarade/hub-contract` est épinglé sur le **tag `v1.3.1`**
+(premier tag qui livre `dist/` commité, indispensable sous Node 24 + `--ignore-scripts`). Ne
+jamais redescendre sous `v1.3.1` : les clés inconnues sont strippées sans erreur. Le dernier
+tag, `v1.4.0`, n'ajoute que le sous-chemin `/session` ; un fork qui en a besoin re-pinne.
+*(Historique : jusqu'au 23/09 le template épinglait un SHA, faute de tag poussé.)*
