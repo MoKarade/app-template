@@ -20,4 +20,5 @@ jobs:
       - name: Commenter la boîte
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr comment 58 --repo "$GITHUB_REPOSITORY" --body "RÉACTEUR : test 4, posté par github-actions[bot]. Rien à faire."
+        run: |
+          gh pr comment 58 --repo "$GITHUB_REPOSITORY" --body "RÉACTEUR : test 4, posté par github-actions[bot]. Rien à faire."
