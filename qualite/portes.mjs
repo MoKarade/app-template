@@ -15,7 +15,7 @@
 //
 // Écrit qualite/rapport.json (non versionné) : c'est ce que lit le cockpit de l'Atelier.
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -164,6 +164,18 @@ function main() {
 
   console.log(`\nPortes qualité — ${config.app}`);
   for (const l of lignes) console.log(`  ${l.statut.padEnd(5)} ${l.libelle.padEnd(42)} ${String(l.valeur).padStart(7)}   seuil ${l.seuil}`);
+
+  // Dans la CI, le tableau (couverture comprise) s'affiche sur la page du job : pas besoin d'ouvrir
+  // le journal pour voir le chiffre, la marge au-dessus du seuil, ni ce qui a reculé.
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    const marque = { OK: "OK", RECUL: "**RECUL**", "—": "—" };
+    const tableau = lignes.map((l) => `| ${l.libelle} | ${l.valeur} | ${l.seuil} | ${marque[l.statut]} |`);
+    appendFileSync(
+      process.env.GITHUB_STEP_SUMMARY,
+      `### Portes qualité — ${config.app}\n\n| Porte | Mesure | Seuil | Statut |\n|---|---|---|---|\n${tableau.join("\n")}\n\n` +
+        (recul ? "**RECUL** : un chiffre est moins bon que son seuil (cliquet).\n" : "Aucune porte n'a reculé.\n"),
+    );
+  }
 
   const commit = lancer("git rev-parse --short HEAD").stdout.trim();
   writeFileSync(RAPPORT, JSON.stringify({ app: config.app, date: new Date().toISOString(), commit, verdict: recul ? "RECUL" : "OK", portes: lignes, durees }, null, 2));

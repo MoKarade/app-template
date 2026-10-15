@@ -61,17 +61,22 @@ Contrôles automatiques en CI, jobs **Qualité** et **Sécurité** : la fusion a
 Principe du **cliquet** : `qualite/seuils.json` fige l'état du jour de la mise en place ; rien ne peut
 reculer. `npm run portes` mesure en local, `npm run portes:maj` resserre après une amélioration.
 
-| Porte | Seuil de départ |
+| Porte | Seuil (mesuré le 24/09/2026, recalibré avec Vitest 5) |
 |---|---|
 | Typage (erreurs) | ≤ 0 |
 | Lint (erreurs) | ≤ 0 |
 | Lint (avertissements) | ≤ 2 |
 | Tests en échec | ≤ 0 |
-| Couverture `lib/` (% lignes) | ≥ 69.4 |
-| Couverture globale (% lignes) | ≥ 48.9 |
-| Couverture globale (% branches) | ≥ 94.2 |
+| Couverture `lib/` (% lignes) | ≥ 84.8 |
+| Couverture globale (% lignes) | ≥ 69.8 |
+| Couverture globale (% branches) | ≥ 71.6 |
 | Code mort (knip) | ≤ 3 |
 | Règles d'architecture (dependency-cruiser) | ≤ 0 |
+
+**Où lire la couverture.** Sur la page de chaque exécution de la CI (job « Qualité », résumé en bas) : mesure,
+seuil et statut de chaque porte. Aucun chiffre cible n'est fixé (décision de Marc, 15/10/2026) : le seuil part
+de la mesure et ne fait que monter (`npm run portes:maj`). Une PR qui fait baisser un de ces chiffres rend le
+job « Qualité » rouge, et la fusion automatique l'attend.
 
 Sécurité : gitleaks sur l'historique qui serait fusionné (HEAD) + Semgrep (TypeScript, React, Next.js,
 secrets, OWASP), bloquants.
