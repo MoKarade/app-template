@@ -6,7 +6,8 @@ exposer `GET /hub/summary` conforme à
 (login Google + autorisation centralisée dans le hub). Tout le reste — l'interface, le
 moteur métier — se construit après le fork.
 
-**Stack** : Next.js 16 (App Router) · Auth.js v5 · TypeScript strict · Vitest.
+**Stack** (au 15/10/2026, source : `package.json`) : Next.js 16 (App Router) · Auth.js v5 ·
+Zod 4 · TypeScript strict · Vitest 5.
 **Destination** : `<nom>.hubperso.com`.
 
 > 📐 Structure de ce fichier et de `docs/` : [convention commune aux huit dépôts](https://github.com/MoKarade/claude-config/blob/main/conventions/STRUCTURE-DEPOT.md).
@@ -73,6 +74,10 @@ moteur métier — se construit après le fork.
 - Branches `claude/<slug>` pour le travail automatisé, `feature/<slug>` pour Marc.
 - Commits en français, préfixés (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
 - **PR en draft** pour itérer.
+- **Fusion** (depuis le 15/10/2026, #29) : Mergify, réglé dans `.mergify.yml`. Une PR hors
+  brouillon, sans l'étiquette `hold`, dont Gate, Qualité et Sécurité sont verts est fusionnée
+  en squash. Une PR qui touche `.github/`, `scripts/hooks/`, `qualite/`, `vercel.json`,
+  `drizzle/` ou `.env*` n'est jamais fusionnée seule : c'est Marc qui fusionne.
 - ❌ Jamais `--force` sur `main`. ❌ Jamais `--no-verify`.
 - ⚠️ **`git fetch origin main` AVANT de committer.** Plusieurs sessions peuvent travailler
   en parallèle sur le même dépôt ; le 20/08/2026, deux d'entre elles ont produit la même
