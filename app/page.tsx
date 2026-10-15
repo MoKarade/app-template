@@ -1,7 +1,18 @@
 // Page d'accueil minimale et honnête : l'app démarre « en construction ».
 // Au fork, remplace-la par ta vraie interface.
+//
+// `requireSession()` est le patron de TOUTE page ou Server Action qui affiche ou écrit des
+// données : le middleware garde déjà la porte, mais une erreur de matcher suffirait à
+// l'ouvrir en silence — deux gardes indépendantes, une seule à se tromper.
 
-export default function Home() {
+import { requireSession } from "@/lib/session";
+
+// Dynamique : `requireSession()` lit les cookies de la requête. Sans cette ligne, `next build`
+// tente de prérendre la page, sans requête ni variables d'auth, et le build échoue.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  await requireSession();
   return (
     <main className="shell">
       <div className="card">

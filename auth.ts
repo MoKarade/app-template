@@ -1,51 +1,56 @@
 // auth.ts
 //
-// Auth.js (NextAuth v5), patron commun des apps privées de l'écosystème : elles affichent
-// des données personnelles réelles, donc elles sont derrière un login Google.
+// Auth.js (NextAuth v5) SANS fournisseur. Cette app lit, elle n'émet pas.
+//
+// Depuis l'ADR 0001 de Hubperso, le hub est la porte d'entrée unique de l'écosystème : une
+// app née de ce template ne parle pas à Google, elle déchiffre le cookie de session posé
+// sur `.hubperso.com`. Pas de `GOOGLE_CLIENT_ID/SECRET` à poser, pas de redirect URI à
+// déclarer côté Google Cloud.
 //
 // ── QUI A LE DROIT D'ENTRER : DEUX ÉTAGES, PAS UN SEUL (ADR 0001 du hub) ─────────────
 //
 // 1. `AUTHORIZED_EMAIL` = le PROPRIÉTAIRE. Vérifié en PREMIER et SANS réseau. Ce n'est
-//    plus « la seule adresse admise » : c'est l'échappatoire qui garantit qu'une panne du
+//    pas « la seule adresse admise » : c'est l'échappatoire qui garantit qu'une panne du
 //    hub — ou une ligne supprimée par erreur — ne peut pas enfermer Marc dehors de sa
 //    propre app.
 // 2. Tout le monde d'autre : `aAccesHub` interroge la table `acces` du hub. C'est là, et
 //    seulement là, que vit la liste. Inviter quelqu'un depuis `hubperso.com/administration`
 //    doit suffire à lui ouvrir cette app, SANS toucher à `AUTHORIZED_EMAIL` ici ni
-//    redéployer quoi que ce soit.
+//    redéployer quoi que ce soit. L'ordre des deux étages est écrit une fois, dans
+//    `lib/decisionAcces.ts`.
 //
 // ── LE CONTRÔLE EST REJOUÉ, PAS FAIT UNE FOIS ────────────────────────────────────────
 //
-// `signIn` ne tourne qu'à la CONNEXION. Le cookie de session étant partagé entre les
-// sous-domaines de hubperso.com (voir `lib/sessionPartagee.ts`), cette app accepterait
-// sans broncher une session fabriquée par une AUTRE app du hub — or un accès accordé pour
-// une seule app ne doit pas ouvrir les autres. Le callback `jwt`, lui, tourne à CHAQUE
-// lecture de session : c'est lui qui rend la révocation réelle. Renvoyer `null` invalide
-// la session (Auth.js v5).
+// Il n'y a PLUS de callback `signIn` : aucune connexion ne se fait ici, il ne tournerait
+// jamais — le garder donnerait l'illusion d'un contrôle. Tout repose sur le callback `jwt`,
+// qui tourne à CHAQUE lecture de session et suit donc la donnée, pas la connexion. Sans lui,
+// l'app accepterait sans broncher une session fabriquée par une AUTRE app du hub (le cookie
+// est partagé entre les sous-domaines, voir `lib/sessionPartagee.ts`) : un accès accordé
+// pour une seule app ne doit pas ouvrir les autres. C'est aussi ce qui rend la révocation
+// réelle — retirer un accès mord dans la minute, sans déconnexion.
 //
-// Session en JWT : pas de base de données requise pour l'auth. Les identifiants OAuth et
-// le secret viennent TOUS de l'environnement, jamais du code (cf. `.env.example`).
+// Session en JWT : pas de base de données requise pour l'auth. Le secret vient de
+// l'environnement, jamais du code (cf. `.env.example`).
 //
 // ── AU FORK ──────────────────────────────────────────────────────────────────────────
 //
 // Rien à changer dans ce fichier. Il reste à : (1) poser les variables d'environnement,
-// (2) déclarer le redirect URI de la nouvelle app côté Google Cloud, (3) ajouter l'app
-// dans `lib/sources.ts` du hub — c'est ce qui la fait apparaître dans /administration et
-// rend son accès attribuable.
+// (2) ajouter l'app dans `lib/sources.ts` du hub — c'est ce qui la fait apparaître dans
+// /administration et rend son accès attribuable. Si l'app doit un jour se connecter SANS
+// le hub, il faudra réintroduire un fournisseur ici ET un callback `signIn` : ce n'est pas
+// le cas d'un fork ordinaire.
 
 import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
-import { isAuthorizedEmail } from "@/lib/authorized";
+import { decideAcces } from "@/lib/decisionAcces";
 import { aAccesHub } from "@/lib/accesHub";
 import { cookiesSessionPartagee } from "@/lib/sessionPartagee";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-  ],
+  // ── AUCUN FOURNISSEUR, ET C'EST LE POINT ────────────────────────────────────────
+  // Auth.js reste indispensable pour autant : c'est lui qui déchiffre le cookie et expose
+  // `auth()` au garde. Les routes `/api/auth/*` continuent de servir la session et la
+  // DÉCONNEXION — laquelle vaut pour toutes les apps, le cookie étant partagé.
+  providers: [],
   session: { strategy: "jwt" },
   // ── CONNEXION UNIQUE ENTRE LES APPS DU HUB ─────────────────────────────────────────
   // Avec `AUTH_COOKIE_DOMAIN=.hubperso.com`, le cookie est déclaré sur le domaine parent :
@@ -58,34 +63,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // sur localhost et sur `<projet>.vercel.app`, et il l'est SILENCIEUSEMENT — on retombe
   // sur /login en boucle, sans erreur nulle part.
   cookies: cookiesSessionPartagee(process.env.AUTH_COOKIE_DOMAIN),
-  // Requis en local/self-hosted (sinon Auth.js lève UntrustedHost). Sans risque : les
-  // redirect URIs sont verrouillés côté Google — un host forgé ne matcherait aucun
-  // callback autorisé. Sur Vercel c'est de toute façon le comportement par défaut.
+  // Requis en local/self-hosted (sinon Auth.js lève UntrustedHost). Sans risque : il n'y a
+  // plus de flux OAuth à détourner, l'app ne fait que déchiffrer.
   trustHost: true,
-  pages: {
-    signIn: "/login",
-    // Le refus d'un compte non autorisé est une ERREUR côté Auth.js : on la rend par
-    // /login, qui lit `?error=` et affiche un message honnête plutôt qu'une page brute.
-    error: "/login",
-  },
+  // `/login` n'est pas une porte mais un couloir vers le hub. Le garde y envoie les
+  // visiteurs sans session, et Auth.js y renvoie ses erreurs : la page s'arrête alors pour
+  // les DIRE, au lieu de rediriger et de boucler.
+  pages: { signIn: "/login", error: "/login" },
   callbacks: {
-    // `false` → Auth.js refuse et redirige vers /login?error=AccessDenied. Aucune session
-    // n'est créée : quelqu'un sans accès ne repart pas avec un cookie inerte.
-    async signIn({ user }) {
-      if (isAuthorizedEmail(user?.email, process.env.AUTHORIZED_EMAIL)) return true;
-      return await aAccesHub(user?.email);
-    },
+    // Renvoyer `null` INVALIDE la session (Auth.js v5) : le middleware redirige vers
+    // /login, aucune donnée n'est rendue.
     async jwt({ token, user }) {
-      // Revérification à CHAQUE lecture (voir l'en-tête). L'adresse est recopiée depuis
-      // `user` à la connexion : sans ça, `token.email` serait vide au premier passage et
-      // la session serait invalidée aussitôt créée.
+      // `user` reste dans la signature bien qu'aucune connexion locale ne le fournisse :
+      // Auth.js le passe encore si une session naît par un chemin qu'on n'a pas prévu.
       if (user?.email) token.email = user.email;
-      if (
-        !isAuthorizedEmail(token.email, process.env.AUTHORIZED_EMAIL) &&
-        !(await aAccesHub(token.email))
-      ) {
-        return null;
-      }
+      if (!(await decideAcces(token.email, process.env.AUTHORIZED_EMAIL, aAccesHub))) return null;
       return token;
     },
   },

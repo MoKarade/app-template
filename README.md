@@ -7,10 +7,11 @@ d'ici. Deux choses sont déjà branchées et testées :
    [`@mokarade/hub-contract`](https://github.com/MoKarade/hub-contract), avec auth
    `x-hub-token` en temps constant — l'app apparaît dans le hub dès le premier déploiement,
    honnêtement « en construction » (`buildingSummary`).
-2. **Un login Google** (Auth.js v5) + middleware **fail-closed**, avec l'autorisation
-   centralisée dans le hub (`lib/accesHub.ts`) — parce que ces apps affichent des données
-   personnelles réelles, et que les apps existantes ont toutes fini par avoir besoin
-   exactement de ça.
+2. **La session du hub** (Auth.js v5 sans fournisseur : l'app lit le cookie posé par
+   `hubperso.com`, elle ne parle pas à Google) + middleware **fail-closed**, avec
+   l'autorisation centralisée dans le hub (`lib/accesHub.ts`) — parce que ces apps affichent
+   des données personnelles réelles, et que les apps existantes ont toutes fini par avoir
+   besoin exactement de ça.
 
 > Ce template condense ce que **Hubperso, FinanceAI, DriveAI, BatchChef et JobAI** ont
 > appris en production. Les avertissements ⚠️ viennent de vrais bugs.
@@ -21,13 +22,17 @@ d'ici. Deux choses sont déjà branchées et testées :
 |---|---|
 | `app/hub/summary/route.ts` | Endpoint du hub : 503 sans `HUB_TOKEN`, 401 sans jeton valide, `no-store`, summary `building` |
 | `lib/hubToken.ts` | Comparaison de jeton en temps constant (SHA-256 + `timingSafeEqual`) |
-| `auth.ts` | Auth.js v5, Google. **Deux étages** : le propriétaire (`AUTHORIZED_EMAIL`, sans réseau) puis le hub. Revérifié à chaque lecture de session |
+| `auth.ts` | Auth.js v5, `providers: []` (session du hub). **Deux étages** : le propriétaire (`AUTHORIZED_EMAIL`, sans réseau) puis le hub. Revérifié à chaque lecture de session |
+| `lib/decisionAcces.ts` | L'ordre des deux étages, écrit une fois (utilisé par `auth.ts` et `lib/session.ts`) |
+| `lib/session.ts` | `requireSession()` : revérification côté serveur dans chaque page ou Server Action |
+| `lib/sessionAsymetrique.ts` | Vérifie le cookie signé du hub (`@mokarade/hub-contract/session`, clés publiques seulement) |
+| `lib/connexionHub.ts` | Où renvoyer quelqu'un sans session : le `/login` du hub, avec un retour interne seulement |
 | `lib/accesHub.ts` | `POST /api/acces` vers le hub, cache 60 s **positifs seulement**, échec fermé |
 | `lib/sessionPartagee.ts` | Cookie de session sur `.hubperso.com` → connexion unique entre les apps |
 | `middleware.ts` | Garde global fail-closed ; exclut `/hub/summary` (auth par jeton) |
 | `lib/authGuard.ts` | Décision de garde en fonctions **pures**, testables |
 | `lib/authConfigured.ts` | Refuse tout si `AUTH_SECRET`/`AUTHORIZED_EMAIL` manquent |
-| `app/login/page.tsx` | Page publique, messages d'erreur honnêtes et distincts |
+| `app/login/page.tsx` | Page publique : renvoie au hub ; messages d'erreur honnêtes et distincts |
 | `tests/` | Contrat, garde d'accès, accès hub (le compte fait foi : `npm run test`) |
 | `.github/workflows/ci.yml` | Gate (typecheck · lint · test · build) + job `audit` séparé, portes qualité et sécurité |
 | `.mergify.yml` | Fusion automatique (Mergify) : fusionne en squash une PR hors brouillon dont Gate, Qualité et Sécurité sont verts |
@@ -77,7 +82,7 @@ Deux authentifications indépendantes, qui ne se recouvrent pas :
 | | Qui | Mécanisme | Échec |
 |---|---|---|---|
 | **Hub → app** | le hub, server-side | header `x-hub-token` | 503 si `HUB_TOKEN` absent, 401 si invalide |
-| **Toi → app** | navigateur | Google OAuth, puis autorisation demandée au hub | 503 si non configurée, redirection `/login` sinon |
+| **Toi → app** | navigateur | session posée par le hub (connexion Google faite chez lui), puis autorisation demandée au hub | 503 si non configurée, redirection `/login` (→ hub) sinon |
 | **App → hub** | l'app, server-side | `POST /api/acces` avec le même `HUB_TOKEN` | `false` (échec fermé) — sauf le propriétaire, qui ne passe pas par là |
 
 ```bash
@@ -135,9 +140,8 @@ Avant chaque commit : `npm run typecheck && npm run lint && npm run test && npm 
 
 ## Déploiement
 
-Vercel (ou tout hôte Next.js). Définir `HUB_TOKEN`, `AUTH_SECRET`, `AUTHORIZED_EMAIL`,
-`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, et en **production seulement**
-`AUTH_COOKIE_DOMAIN=.hubperso.com`. Domaine cible : `<nom>.hubperso.com` — et pas une
+Vercel (ou tout hôte Next.js). Définir `HUB_TOKEN`, `AUTH_SECRET`, `AUTHORIZED_EMAIL`, et en **production seulement**
+`AUTH_COOKIE_DOMAIN=.hubperso.com` (`HUB_SESSION_PUBLIC_KEYS` quand le hub publie ses clés). Domaine cible : `<nom>.hubperso.com` — et pas une
 adresse en `.vercel.app` : un cookie ne franchit pas la frontière entre deux domaines, donc
 la connexion unique ne marcherait pas.
 
@@ -145,18 +149,18 @@ la connexion unique ne marcherait pas.
 différent, l'app reçoit bien le cookie partagé mais n'arrive pas à le déchiffrer : elle
 renvoie sur `/login`, l'utilisateur se reconnecte, et ça recommence.
 
-Redirect URIs à déclarer côté Google Cloud :
-`http://localhost:3000/api/auth/callback/google` et
-`https://<nom>.hubperso.com/api/auth/callback/google`.
+Rien à déclarer côté Google Cloud : l'app n'a plus de client OAuth, la connexion Google se
+fait sur le hub (ADR 0001 du hub). Corollaire : en local, l'app seule ne peut pas ouvrir de
+session — `/login` renvoie au hub.
 
-Chaque app garde **son propre** client OAuth. Le projet à client unique a été envisagé puis
-abandonné (voir l'amendement de l'ADR 0001 du hub) : ce qui est centralisé, c'est
-l'**autorisation**, pas l'authentification Google.
+⚠️ Pour l'instant le middleware ne lit que la session Auth.js (cookie chiffré) ; le cookie
+signé du hub n'est lu que par `requireSession()`. Tant que le hub n'émet pas ce cookie, rien
+ne change en production.
 
 ## Version du contrat
 
 Au 15/10/2026 (`package.json`) : `@mokarade/hub-contract` est épinglé sur le **tag `v1.4.0`**
-(additif : sous-chemin `/session`, non utilisé ici). Ne jamais redescendre sous `v1.3.1`,
+(additif : sous-chemin `/session`, lu par `lib/sessionAsymetrique.ts`). Ne jamais redescendre sous `v1.3.1`,
 premier tag qui livre `dist/` commité (indispensable sous Node 24 + `--ignore-scripts`) : les
 clés inconnues sont strippées sans erreur.
 *(Historique : jusqu'au 23/09 le template épinglait un SHA, faute de tag poussé.)*
