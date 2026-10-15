@@ -86,7 +86,7 @@ Zod 4 · TypeScript strict · Vitest 5.
 - **Fusion** (depuis le 15/10/2026, #29) : Mergify, réglé dans `.mergify.yml`. Une PR hors
   brouillon, sans l'étiquette `hold`, dont Gate, Qualité et Sécurité sont verts est fusionnée
   en squash. Une PR qui touche `.github/`, `scripts/hooks/`, `qualite/`, `vercel.json`,
-  `drizzle/` ou `.env*` n'est jamais fusionnée seule : c'est Marc qui fusionne.
+  `drizzle/` ou `.env*` est fusionnée aussi quand le contrôle « Garde-fou » est vert (oui de Marc, 15/10/2026) ; rouge (test retiré ou sauté, seuil baissé, secret, migration destructive, `.mergify.yml` ou garde-fou modifié), elle attend Marc (issue `qui:marc`).
 - ❌ Jamais `--force` sur `main`. ❌ Jamais `--no-verify`.
 - ⚠️ **`git fetch origin main` AVANT de committer.** Plusieurs sessions peuvent travailler
   en parallèle sur le même dépôt ; le 20/08/2026, deux d'entre elles ont produit la même
