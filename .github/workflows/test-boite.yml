@@ -1,0 +1,23 @@
+name: Test boîte (temporaire)
+
+# Test jetable sur la branche claude/boite-reacteur : un commentaire posté par
+# github-actions[bot] sur la boîte (#58) réveille-t-il une session abonnée ?
+# À supprimer après le test ; ne doit jamais être fusionné.
+on:
+  push:
+    branches: [claude/boite-reacteur]
+    paths: ['.github/workflows/test-boite.yml']
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  commenter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Commenter la boîte
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr comment 58 --repo "$GITHUB_REPOSITORY" --body "RÉACTEUR : test 4, posté par github-actions[bot]. Rien à faire."
