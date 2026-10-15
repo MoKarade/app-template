@@ -222,6 +222,8 @@ place redevient huit conventions différentes en trois mois.
 
 1. Personnaliser `APP` (id/name/url/color) dans `app/hub/summary/route.ts`. L'`id` doit
    correspondre EXACTEMENT à l'entrée de `lib/sources.ts` côté Hubperso.
+   Verrouillé : `tests/forkIdentite.test.ts` rougit le gate tant que `APP.id` vaut `app-template`
+   (le squelette en est exempté par l'identité de son dépôt, rien à retirer au fork).
 2. Configurer l'environnement (cf. `.env.example`) : `HUB_TOKEN`, `AUTH_SECRET`,
    `AUTHORIZED_EMAIL`, `GOOGLE_CLIENT_ID/SECRET`, et en **production seulement**
    `AUTH_COOKIE_DOMAIN=.hubperso.com`.
