@@ -6,7 +6,7 @@ exposer `GET /hub/summary` conforme à
 (login Google + autorisation centralisée dans le hub). Tout le reste — l'interface, le
 moteur métier — se construit après le fork.
 
-**Stack** : Next.js 15 (App Router) · Auth.js v5 · TypeScript strict · Vitest.
+**Stack** : Next.js 16 (App Router) · Auth.js v5 · TypeScript strict · Vitest.
 **Destination** : `<nom>.hubperso.com`.
 
 > 📐 Structure de ce fichier et de `docs/` : [convention commune aux huit dépôts](https://github.com/MoKarade/claude-config/blob/main/conventions/STRUCTURE-DEPOT.md).
