@@ -14,16 +14,19 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   await requireSession();
   return (
-    <main className="shell">
-      <div className="card">
-        <p className="eyebrow">hubperso.com</p>
+    <main className="principal">
+      <div className="carte carte-corps">
+        <p className="surtitre">hubperso.com</p>
         <h1>App Template</h1>
-        <p className="lead">
+        <p>
+          <span className="pastille alerte">En construction</span>
+        </p>
+        <p>
           Squelette prêt à forker. L’endpoint <code>/hub/summary</code> est déjà branché sur
           le hub (contrat v1) et renvoie un état « en construction » tant que le moteur
           n’est pas actif.
         </p>
-        <p className="hint">
+        <p className="doux">
           Remplace ce contenu par ta vraie interface, et le <code>buildingSummary</code> de{" "}
           <code>app/hub/summary/route.ts</code> par tes vraies données quand elles existent.
         </p>

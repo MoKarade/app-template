@@ -46,29 +46,31 @@ export default async function LoginPage({
   }
 
   return (
-    <main className="login">
-      <h1 className="login__title">Connexion</h1>
+    <main className="principal">
+      <div className="carte carte-corps">
+        <h1>Connexion</h1>
 
-      {!configured && (
-        <p className="login__error">
-          Authentification non configurée (AUTH_SECRET / AUTHORIZED_EMAIL manquants). La
-          redirection vers le hub est retenue exprès : sans ces variables, l&apos;app ne
-          pourrait pas lire la session qu&apos;il lui rendrait, et on tournerait en rond.
+        {!configured && (
+          <p className="bandeau erreur">
+            Authentification non configurée (AUTH_SECRET / AUTHORIZED_EMAIL manquants). La
+            redirection vers le hub est retenue exprès : sans ces variables, l&apos;app ne
+            pourrait pas lire la session qu&apos;il lui rendrait, et on tournerait en rond.
+          </p>
+        )}
+
+        {error && (
+          <p className="bandeau erreur">
+            Session refusée. Ce compte n&apos;a pas accès à cette app : demande l&apos;accès
+            depuis l&apos;administration du hub.
+          </p>
+        )}
+
+        <p>
+          <a className="bouton bouton-principal" href={URL_HUB}>
+            Aller au hub
+          </a>
         </p>
-      )}
-
-      {error && (
-        <p className="login__error">
-          Session refusée. Ce compte n&apos;a pas accès à cette app : demande l&apos;accès
-          depuis l&apos;administration du hub.
-        </p>
-      )}
-
-      <p>
-        <a className="login__btn" href={URL_HUB}>
-          Aller au hub
-        </a>
-      </p>
+      </div>
     </main>
   );
 }
