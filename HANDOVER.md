@@ -14,7 +14,7 @@
 - **Fusion** : Mergify (`.mergify.yml`, depuis le 15/10, #29) ; l'auto-merge maison
   (`auto-merge.yml` + `scripts/autoMerge.mjs`) est retiré. Les PR qui touchent `.github/`,
   `scripts/hooks/`, `qualite/`, `vercel.json`, `drizzle/` ou `.env*` restent fusionnées par Marc.
-- **CI** : les jobs tournent sur le runner auto-hébergé du PC de Marc (`pc-marc`, #22).
+- **CI** : les jobs choisissent leur machine selon la visibilité du dépôt : privé, runner auto-hébergé du PC de Marc (`pc-marc`, #22) ; public, machines GitHub (gratuites). Un fork public hérite donc de la bonne machine sans rien changer.
 - **En cours** : rien.
 - **Gel décidé par Marc le 14/10 : aucun nouveau travail sur les apps tant que le plan de
   réduction du temps des PR est en cours.**
