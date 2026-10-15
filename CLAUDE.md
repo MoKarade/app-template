@@ -77,6 +77,11 @@ Zod 4 · TypeScript strict · Vitest 5.
   toute version minimale imposée par une faille — ex. `drizzle-orm ≥ 0.45.2`
   (GHSA-gpj5-g38j-94v9, injection SQL, HIGH) chez BatchChef.
 - Ne pas imposer le dark mode : `prefers-color-scheme` décide.
+- **Socle visuel** (`app/globals.css`, tâche #39) : couleurs en variables, clair et sombre, et
+  nulle part ailleurs — ni valeur de couleur ni classe de palette dans `app/`, `components/`,
+  `lib/`. Vocabulaire `.carte` `.bouton` `.champ` `.doux` `.succes` `.alerte` `.erreur`. Cibles
+  ≥ 44 px, champs à 16 px. ⚠️ Une couleur figée est lisible dans le thème où on l'a écrite :
+  BatchChef a eu 21 « blanc sur blanc » sans une erreur. Verrouillé par `tests/theme.test.ts`.
 
 ## 3. Workflow git
 
