@@ -1,20 +1,20 @@
 # HANDOVER — app-template
 
-## État au 14/10/2026
+## État au 15/10/2026
 
 - **Ce qui tourne** : rien n'est déployé (c'est un squelette). Branche par défaut : **`main`**
-  (mesuré : `git ls-remote --symref origin HEAD`). Pile au 14/10 (`package.json`) : Next.js
+  (mesuré : `git ls-remote --symref origin HEAD`). Pile au 15/10 (`package.json`) : Next.js
   16.3.5, Auth.js v5 bêta, Zod 4, Vitest 5, `@mokarade/hub-contract` épinglé sur le tag
-  `v1.3.1` (le dernier tag est `v1.4.0`, qui n'ajoute que `/session` : pas de re-pin requis).
+  `v1.4.0` (#33).
 - **Livré depuis la dernière mise à jour de ce fichier** (d'après `git log`, dernier commit le
   24/09) : Node 24 + fusion automatique (#12), re-pin `v1.3.1` (#13), portes qualité S6 (#14),
   Next 15 → 16.3.5 (#19), Zod 3 → 4 (#18), Vitest 5 et couverture recalibrée (#20),
-  mises à jour Dependabot (#15, #17).
-- **Fusion** : auto-merge maison `.github/workflows/auto-merge.yml` + `scripts/autoMerge.mjs`
-  (décision pure, testée par `tests/autoMerge.test.ts`) ; pas de `CODEOWNERS`. Le parc a
-  basculé sur la fusion native le 01/10 (Hubperso, CarAI, MemoryAI, DriveAI), pas ce dépôt —
-  un fork hérite donc du kit maison. ⚠️ À trancher par Marc (14/10) : aligner ou non le
-  squelette.
+  mises à jour Dependabot (#15, #17), CI sur le runner du PC (#22), fusion par Mergify à la
+  place de l'auto-merge maison (#29), re-pin `v1.4.0` (#33).
+- **Fusion** : Mergify (`.mergify.yml`, depuis le 15/10, #29) ; l'auto-merge maison
+  (`auto-merge.yml` + `scripts/autoMerge.mjs`) est retiré. Les PR qui touchent `.github/`,
+  `scripts/hooks/`, `qualite/`, `vercel.json`, `drizzle/` ou `.env*` restent fusionnées par Marc.
+- **CI** : les jobs tournent sur le runner auto-hébergé du PC de Marc (`pc-marc`, #22).
 - **En cours** : rien.
 - **Gel décidé par Marc le 14/10 : aucun nouveau travail sur les apps tant que le plan de
   réduction du temps des PR est en cours.**
@@ -32,7 +32,7 @@ utile est donc : *qu'est-ce qu'un fork obtient aujourd'hui ?*
 | Cookie de session partagé sur `.hubperso.com` | ✅ branché (20/08/2026) |
 | CI : gate (typecheck · lint · test · build) + job `audit` séparé | ✅ branché |
 | Portes qualité S6 (cliquet, gitleaks, Semgrep) | ✅ branché (23/09/2026) |
-| Auto-merge maison (`auto-merge.yml` + `scripts/autoMerge.mjs`) | ✅ branché (23/09/2026) — voir « État au 14/10 » |
+| Fusion automatique par Mergify (`.mergify.yml`) | ✅ branché (15/10/2026) — voir « État au 15/10 » |
 | Interface, moteur métier, base de données | ❌ à construire après le fork |
 
 ## Ce qu'un fork doit faire
@@ -43,7 +43,7 @@ ait qu'un exemplaire.
 ## Ce qui reste à poser sur le dépôt lui-même
 
 - ~~Le dépôt n'a pas de branche `main`~~ — *historique* : réglé, la branche par défaut est
-  `main` (constaté le 14/10/2026).
+  `main` (constaté le 15/10/2026).
 - `docs/adr/` est créé mais vide : le template n'a pas de décision architecturale propre,
   celles qui le concernent vivent dans l'ADR 0001 de Hubperso.
 

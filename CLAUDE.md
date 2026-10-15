@@ -6,7 +6,7 @@ exposer `GET /hub/summary` conforme à
 (login Google + autorisation centralisée dans le hub). Tout le reste — l'interface, le
 moteur métier — se construit après le fork.
 
-**Stack** (au 14/10/2026, source : `package.json`) : Next.js 16 (App Router) · Auth.js v5 ·
+**Stack** (au 15/10/2026, source : `package.json`) : Next.js 16 (App Router) · Auth.js v5 ·
 Zod 4 · TypeScript strict · Vitest 5.
 **Destination** : `<nom>.hubperso.com`.
 
@@ -74,11 +74,10 @@ Zod 4 · TypeScript strict · Vitest 5.
 - Branches `claude/<slug>` pour le travail automatisé, `feature/<slug>` pour Marc.
 - Commits en français, préfixés (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
 - **PR en draft** pour itérer.
-- **Fusion, constat au 14/10/2026** : ce dépôt porte encore l'auto-merge MAISON
-  (`.github/workflows/auto-merge.yml` + `scripts/autoMerge.mjs`, porté de Hubperso le
-  23/09) et n'a pas de `CODEOWNERS`. Hubperso, CarAI, MemoryAI et DriveAI l'ont retiré le
-  01/10 au profit de la fusion native de GitHub ; pas ce dépôt. Un fork hérite donc du kit
-  maison. ⚠️ À trancher par Marc (14/10) : aligner ou non le squelette sur la fusion native.
+- **Fusion** (depuis le 15/10/2026, #29) : Mergify, réglé dans `.mergify.yml`. Une PR hors
+  brouillon, sans l'étiquette `hold`, dont Gate, Qualité et Sécurité sont verts est fusionnée
+  en squash. Une PR qui touche `.github/`, `scripts/hooks/`, `qualite/`, `vercel.json`,
+  `drizzle/` ou `.env*` n'est jamais fusionnée seule : c'est Marc qui fusionne.
 - ❌ Jamais `--force` sur `main`. ❌ Jamais `--no-verify`.
 - ⚠️ **`git fetch origin main` AVANT de committer.** Plusieurs sessions peuvent travailler
   en parallèle sur le même dépôt ; le 20/08/2026, deux d'entre elles ont produit la même
