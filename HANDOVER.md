@@ -32,6 +32,7 @@ utile est donc : *qu'est-ce qu'un fork obtient aujourd'hui ?*
 | Cookie de session partagé sur `.hubperso.com` | ✅ branché (20/08/2026) |
 | CI : gate (typecheck · lint · test · build) + job `audit` séparé | ✅ branché |
 | Portes qualité S6 (cliquet, gitleaks, Semgrep) | ✅ branché (23/09/2026) |
+| Gate rouge tant que `APP.id` vaut encore `app-template` (`tests/forkIdentite.test.ts`) | ✅ branché (15/10/2026, tâche #24) |
 | Fusion automatique par Mergify (`.mergify.yml`) | ✅ branché (15/10/2026) — voir « État au 15/10 » |
 | Interface, moteur métier, base de données | ❌ à construire après le fork |
 
