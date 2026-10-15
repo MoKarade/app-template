@@ -1,0 +1,37 @@
+name: Boîte du Réacteur
+
+# Pourquoi ce workflow : un commentaire posté avec le compte de Marc ne réveille
+# jamais une session abonnée (GitHub ne notifie pas l'auteur de ses propres
+# commentaires). Un commentaire de github-actions[bot] la réveille : prouvé le
+# 15/10/2026 sur la boîte (PR brouillon permanente #58).
+# Déclenché par la routine Réacteur (workflow_dispatch), jamais par un événement.
+on:
+  workflow_dispatch:
+    inputs:
+      texte:
+        description: "Motif du réveil (une ou deux lignes factuelles)"
+        required: true
+        type: string
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  commenter:
+    if: github.repository == 'MoKarade/app-template'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Commenter la boîte
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TEXTE: ${{ inputs.texte }}
+        run: |
+          corps="$TEXTE"
+          case "$corps" in
+            "RÉACTEUR :"*) ;;
+            *) corps="RÉACTEUR : $corps" ;;
+          esac
+          corps="${corps:0:600}"
+          gh pr comment 58 --repo "$GITHUB_REPOSITORY" --body "$corps"
