@@ -203,6 +203,21 @@ describe("socle visuel — clair ET sombre", () => {
     }
   });
 
+  it(".pastille est déclarée avant les états .succes, .alerte et .erreur", () => {
+    // Même spécificité : la dernière règle gagne. Une `.pastille` déclarée après les états
+    // impose son fond gris, et `.pastille.alerte` reste grise (constaté sur MemoryAI#126).
+    const position = (classe: string): number =>
+      CSS.search(new RegExp(`^\\.${classe}\\s*\\{`, "m"));
+    const pastille = position("pastille");
+    expect(pastille, ".pastille introuvable dans globals.css").toBeGreaterThanOrEqual(0);
+    for (const etat of ["succes", "alerte", "erreur"]) {
+      const place = position(etat);
+      expect(place, `.${etat} introuvable dans globals.css`).toBeGreaterThanOrEqual(0);
+      expect(pastille, `.pastille doit précéder .${etat} (sinon elle masque l'état)`)
+        .toBeLessThan(place);
+    }
+  });
+
   it("les couples texte/fond passent le WCAG dans les DEUX thèmes (texte 4,5:1 ; contour 3:1)", () => {
     const lin = (c: number): number => {
       const x = c / 255;
