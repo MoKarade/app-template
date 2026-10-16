@@ -39,6 +39,7 @@ utile est donc : *qu'est-ce qu'un fork obtient aujourd'hui ?*
 | `CLAUDE.md` de 60 lignes au plus, détail dans `docs/claude/` (`tests/claudeMd.test.ts`) | ✅ branché (16/10/2026, tâche #31) |
 | Contrôles communs de `MoKarade/.github` appelés par la CI : sécurité (`securite-commune`), grille de conformité (`conformite`, tableau dans le résumé du job) et fumée de production (`fumee.yml`, déclenchée par un déploiement : jamais ici, le squelette n'est pas déployé) | ✅ branché (16/10/2026, tâche #37) |
 | Fusion automatique par Mergify (`.mergify.yml`) | ✅ branché (15/10/2026) — voir « État au 15/10 » |
+| Suivi des erreurs : Sentry (`instrumentation.ts`, `instrumentation-client.ts`, `lib/sentryConfig.ts`), éteint sans `SENTRY_DSN`, aucune donnée personnelle (verrou `tests/sentryConfig.test.ts`) ; essai manuel : workflow « Essai Sentry » | ✅ branché (16/10/2026, tâche #40) |
 | Interface, moteur métier, base de données | ❌ à construire après le fork |
 
 ## Ce qu'un fork doit faire
