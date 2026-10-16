@@ -258,6 +258,21 @@ code {
   color: var(--texte-doux);
 }
 
+/* Pastille : à combiner avec .succes, .alerte ou .erreur. Déclarée AVANT les états : à
+   spécificité égale la dernière règle gagne, donc l'état doit venir après pour colorer la
+   pastille (verrou : tests/theme.test.ts). */
+.pastille {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background-color: var(--surface-douce);
+  color: var(--texte);
+}
+
 /* ── États : fond sémantique ET libellé texte, jamais la couleur seule. ── */
 .succes {
   background-color: var(--succes-fond);
@@ -276,19 +291,6 @@ code {
 }
 .texte-erreur {
   color: var(--erreur-texte);
-}
-
-/* Pastille : à combiner avec .succes, .alerte ou .erreur. */
-.pastille {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding: 2px 10px;
-  border-radius: 9999px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  background-color: var(--surface-douce);
-  color: var(--texte);
 }
 
 /* Bandeau d'état : fond sémantique + contour de la même couleur. */
