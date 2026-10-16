@@ -4,7 +4,7 @@
 - Squelette d'app de l'écosystème hub perso : expose `GET /hub/summary` conforme à [`@mokarade/hub-contract`](https://github.com/MoKarade/hub-contract) et reste **privée** (connexion et autorisation centralisées dans le hub). L'interface et le moteur métier se construisent après le fork.
 - Stack (source : `package.json`) : Next.js 16 (App Router) · Auth.js v5 (`providers: []`, session du hub) · Zod 4 · TypeScript strict · Vitest 5. Destination : `<nom>.hubperso.com`.
 - Condense ce que les cinq apps ont appris en production ; chaque ⚠️ vient d'un vrai bug. **Au fork, commencer par `docs/claude/11-fork.md`.**
-- État : `HANDOVER.md` (à lire en premier) ; plan : `BACKLOG.md` ; décisions : `docs/adr/`.
+- État : `HANDOVER.md` (à lire en premier) ; plan : les issues du dépôt (`BACKLOG.md` n'est qu'un renvoi) ; décisions : `docs/adr/`.
 
 ## Commandes
 - `npm run dev` · `npm run test` · `npm run typecheck` · `npm run lint` · `npm run build` · `npm run portes`.
