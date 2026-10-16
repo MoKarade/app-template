@@ -23,3 +23,9 @@
    ADR dans `docs/adr/` à la première décision architecturale.
 7. Dans `.github/workflows/fumee.yml`, mettre l'adresse de production de l'app dans `url-base` et
    créer le secret `HUB_TOKEN` du dépôt : la fumée sonde l'app après chaque déploiement de production.
+8. **Sentry** : le squelette envoie ses erreurs serveur et navigateur à Sentry dès que `SENTRY_DSN`
+   est défini (éteint sans lui). Au fork : créer le projet Sentry de l'app (un projet par app,
+   organisation `mokarade`), poser `SENTRY_DSN` dans Vercel ET comme secret du dépôt, puis lancer le
+   workflow « Essai Sentry » (Actions > Essai Sentry > Run workflow) : il échoue si Sentry ne répond
+   pas 2xx. Ne jamais mettre `sendDefaultPii` à vrai ni contourner `lib/sentryConfig.ts` : aucune
+   donnée personnelle en ligne.
