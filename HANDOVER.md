@@ -33,6 +33,7 @@ utile est donc : *qu'est-ce qu'un fork obtient aujourd'hui ?*
 | CI : gate (typecheck · lint · test · build) + job `audit` séparé | ✅ branché |
 | Portes qualité S6 (cliquet, gitleaks, Semgrep) | ✅ branché (23/09/2026) |
 | Socle visuel commun : jetons de couleur clair/sombre, `.carte` `.bouton` `.champ`, cibles ≥ 44 px (`app/globals.css`, verrou `tests/theme.test.ts`) | ✅ branché (15/10/2026, tâche #39) |
+| Seule `main` se déploie sur Vercel, aucune préversion (`vercel.json`, verrou `tests/vercel.test.ts`) | ✅ branché (16/10/2026, tâche #41) |
 | Gate rouge tant que `APP.id` vaut encore `app-template` (`tests/forkIdentite.test.ts`) | ✅ branché (15/10/2026, tâche #24) |
 | Fusion automatique par Mergify (`.mergify.yml`) | ✅ branché (15/10/2026) — voir « État au 15/10 » |
 | Interface, moteur métier, base de données | ❌ à construire après le fork |
