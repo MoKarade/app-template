@@ -1,4 +1,4 @@
-name: Essai de la relecture IA
+name: Essai de la fumée commune
 
 # Workflow d'essai, retiré juste après (MoKarade/.github#97) : il ne se lance qu'à la main et appelle
 # la fumée commune comme fumee.yml, avec le même secret.
