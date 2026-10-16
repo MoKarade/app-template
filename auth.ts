@@ -71,7 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // les DIRE, au lieu de rediriger et de boucler.
   pages: { signIn: "/login", error: "/login" },
   callbacks: {
-    // Renvoyer `null` INVALIDE la session (Auth.js v5) : le middleware redirige vers
+    // Renvoyer `null` INVALIDE la session (Auth.js v5) : le proxy redirige vers
     // /login, aucune donnée n'est rendue.
     async jwt({ token, user }) {
       // `user` reste dans la signature bien qu'aucune connexion locale ne le fournisse :

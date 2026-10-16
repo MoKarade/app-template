@@ -8,7 +8,7 @@ d'ici. Deux choses sont déjà branchées et testées :
    `x-hub-token` en temps constant — l'app apparaît dans le hub dès le premier déploiement,
    honnêtement « en construction » (`buildingSummary`).
 2. **La session du hub** (Auth.js v5 sans fournisseur : l'app lit le cookie posé par
-   `hubperso.com`, elle ne parle pas à Google) + middleware **fail-closed**, avec
+   `hubperso.com`, elle ne parle pas à Google) + proxy **fail-closed**, avec
    l'autorisation centralisée dans le hub (`lib/accesHub.ts`) — parce que ces apps affichent
    des données personnelles réelles, et que les apps existantes ont toutes fini par avoir
    besoin exactement de ça.
@@ -29,7 +29,7 @@ d'ici. Deux choses sont déjà branchées et testées :
 | `lib/connexionHub.ts` | Où renvoyer quelqu'un sans session : le `/login` du hub, avec un retour interne seulement |
 | `lib/accesHub.ts` | `POST /api/acces` vers le hub, cache 60 s **positifs seulement**, échec fermé |
 | `lib/sessionPartagee.ts` | Cookie de session sur `.hubperso.com` → connexion unique entre les apps |
-| `middleware.ts` | Garde global fail-closed ; exclut `/hub/summary` (auth par jeton) |
+| `proxy.ts` (ex-`middleware.ts`, renommé par Next 16) | Garde global fail-closed ; exclut `/hub/summary` (auth par jeton) |
 | `lib/authGuard.ts` | Décision de garde en fonctions **pures**, testables |
 | `lib/authConfigured.ts` | Refuse tout si `AUTH_SECRET`/`AUTHORIZED_EMAIL` manquent |
 | `app/login/page.tsx` | Page publique : renvoie au hub ; messages d'erreur honnêtes et distincts |
@@ -39,7 +39,7 @@ d'ici. Deux choses sont déjà branchées et testées :
 
 ## ⚠️ Les deux pièges à ne pas rejouer
 
-**`/hub/summary` doit rester hors du middleware d'auth utilisateur.** Il porte sa propre
+**`/hub/summary` doit rester hors du proxy d'auth utilisateur.** Il porte sa propre
 auth. S'il tombe derrière la session, le hub reçoit une redirection HTML au lieu du JSON →
 widget « injoignable » en permanence, alors que l'app marche parfaitement dans ton
 navigateur. JobAI l'a appelé « le défaut n°1 du squelette ». Verrouillé par `tests/auth.test.ts`.
@@ -92,7 +92,7 @@ node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))"
 npx auth secret
 ```
 
-⚠️ **Fail-closed voulu** : sans `AUTH_SECRET`/`AUTHORIZED_EMAIL`, le middleware répond 503 et
+⚠️ **Fail-closed voulu** : sans `AUTH_SECRET`/`AUTHORIZED_EMAIL`, le proxy répond 503 et
 ne sert RIEN. Auth.js seul se contente de logguer `MissingSecret` et **laisse passer** —
 constaté en préproduction sur le hub, qui servait ses données sans login.
 
@@ -153,7 +153,7 @@ Rien à déclarer côté Google Cloud : l'app n'a plus de client OAuth, la conne
 fait sur le hub (ADR 0001 du hub). Corollaire : en local, l'app seule ne peut pas ouvrir de
 session — `/login` renvoie au hub.
 
-⚠️ Pour l'instant le middleware ne lit que la session Auth.js (cookie chiffré) ; le cookie
+⚠️ Pour l'instant le proxy ne lit que la session Auth.js (cookie chiffré) ; le cookie
 signé du hub n'est lu que par `requireSession()`. Tant que le hub n'émet pas ce cookie, rien
 ne change en production.
 

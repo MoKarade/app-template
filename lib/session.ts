@@ -1,6 +1,6 @@
 // lib/session.ts — revérification de session côté serveur (défense en profondeur).
 //
-// Le middleware garde déjà tout ce qui n'est pas explicitement public. Revérifier ICI n'est
+// Le proxy garde déjà tout ce qui n'est pas explicitement public. Revérifier ICI n'est
 // pas redondant : une erreur de matcher — un caractère dans une expression régulière —
 // suffirait à exposer une route sans que rien ne le signale. Deux gardes indépendantes, une
 // seule à se tromper. Une Server Action est de plus un point d'entrée POST à part entière,
