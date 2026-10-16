@@ -159,8 +159,8 @@ ne change en production.
 
 ## Version du contrat
 
-Au 15/10/2026 (`package.json`) : `@mokarade/hub-contract` est épinglé sur le **tag `v1.4.0`**
-(additif : sous-chemin `/session`, lu par `lib/sessionAsymetrique.ts`). Ne jamais redescendre sous `v1.3.1`,
+Au 16/10/2026 (`package.json`) : `@mokarade/hub-contract` est épinglé sur le **tag `v1.5.0`**
+(le contrat passe à zod 4 ; `v1.4.0` avait ajouté le sous-chemin `/session`, lu par `lib/sessionAsymetrique.ts`). Ne jamais redescendre sous `v1.3.1`,
 premier tag qui livre `dist/` commité (indispensable sous Node 24 + `--ignore-scripts`) : les
 clés inconnues sont strippées sans erreur.
 *(Historique : jusqu'au 23/09 le template épinglait un SHA, faute de tag poussé.)*

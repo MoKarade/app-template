@@ -15,10 +15,10 @@
     "portes:maj": "node qualite/portes.mjs --maj"
   },
   "//vercel-build": "AU FORK, dès que l'app a une base : ajouter \"vercel-build\": \"npm run db:migrate && next build\". Vercel utilise ce script à la place de \"build\" quand il existe → les migrations s'appliquent à CHAQUE déploiement, prod et previews. Exigence de Marc : ne JAMAIS avoir à lancer une commande sur son PC. Idempotent (table de suivi Drizzle). Alternative vue chez JobAI : migrations appliquées au DÉMARRAGE de l'app (lib/migrations.ts, mémorisées par processus) — à préférer si l'app doit aussi se réparer seule hors déploiement.",
-  "//hub-contract": "Épinglé sur le TAG v1.4.0 (15/10/2026, additif : sous-chemin /session et peerDependency optionnelle jose, CONTRACT_VERSION inchangé ; /session lu par lib/sessionAsymetrique.ts, cf. //jose). Depuis v1.3.1 (23/09/2026) : dernier contrat (serveSummary, ContractTooNewError, /endpoint, usage, details, primary, recommendation, expectedMaxAgeSec) ET dist/ commité — sous Node 24, npm 11 ne construit plus une dépendance git en --ignore-scripts, et npm 12 coupera les scripts d'installation par défaut. Ne jamais redescendre sous v1.3.1 : les clés inconnues sont strippées sans erreur, et un tag sans dist/ casse l'installation",
+  "//hub-contract": "Épinglé sur le TAG v1.5.0 (16/10/2026 : le contrat passe à zod 4, un seul zod dans l'arbre ; v1.4.0 du 15/10 avait ajouté le sous-chemin /session et la peerDependency optionnelle jose, lus par lib/sessionAsymetrique.ts, cf. //jose). Depuis v1.3.1 (23/09/2026) : dernier contrat (serveSummary, ContractTooNewError, /endpoint, usage, details, primary, recommendation, expectedMaxAgeSec) ET dist/ commité — sous Node 24, npm 11 ne construit plus une dépendance git en --ignore-scripts, et npm 12 coupera les scripts d'installation par défaut. Ne jamais redescendre sous v1.3.1 : les clés inconnues sont strippées sans erreur, et un tag sans dist/ casse l'installation",
   "//jose": "Peer dependency OPTIONNELLE de @mokarade/hub-contract/session (^6.0.0) : requise seulement parce que lib/sessionAsymetrique.ts importe ce sous-chemin. Épinglée en direct plutôt que laissée en transitive de next-auth, qui n'en garantit pas la version.",
   "dependencies": {
-    "@mokarade/hub-contract": "github:MoKarade/hub-contract#v1.4.0",
+    "@mokarade/hub-contract": "github:MoKarade/hub-contract#v1.5.0",
     "jose": "^6.2.12",
     "next": "^16.3.5",
     "next-auth": "^5.0.0-beta.31",
