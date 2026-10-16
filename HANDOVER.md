@@ -35,12 +35,13 @@ utile est donc : *qu'est-ce qu'un fork obtient aujourd'hui ?*
 | Socle visuel commun : jetons de couleur clair/sombre, `.carte` `.bouton` `.champ`, cibles ≥ 44 px (`app/globals.css`, verrou `tests/theme.test.ts`) | ✅ branché (15/10/2026, tâche #39) |
 | Seule `main` se déploie sur Vercel, aucune préversion (`vercel.json`, verrou `tests/vercel.test.ts`) | ✅ branché (16/10/2026, tâche #41) |
 | Gate rouge tant que `APP.id` vaut encore `app-template` (`tests/forkIdentite.test.ts`) | ✅ branché (15/10/2026, tâche #24) |
+| `CLAUDE.md` de 60 lignes au plus, détail dans `docs/claude/` (`tests/claudeMd.test.ts`) | ✅ branché (16/10/2026, tâche #31) |
 | Fusion automatique par Mergify (`.mergify.yml`) | ✅ branché (15/10/2026) — voir « État au 15/10 » |
 | Interface, moteur métier, base de données | ❌ à construire après le fork |
 
 ## Ce qu'un fork doit faire
 
-La checklist fait foi : **`CLAUDE.md` § 11**. Elle est tenue là, pas ici, pour qu'il n'y en
+La checklist fait foi : **[`docs/claude/11-fork.md`](./docs/claude/11-fork.md)**. Elle est tenue là, pas ici, pour qu'il n'y en
 ait qu'un exemplaire.
 
 ## Ce qui reste à poser sur le dépôt lui-même
@@ -52,7 +53,7 @@ ait qu'un exemplaire.
 
 ## Où lire la suite
 
-- [`CLAUDE.md`](./CLAUDE.md) — comment on travaille ici, et la checklist de fork.
+- [`CLAUDE.md`](./CLAUDE.md) — comment on travaille ici (court) ; le détail et la checklist de fork sont dans [`docs/claude/`](./docs/claude/).
 - [Convention de structure](https://github.com/MoKarade/claude-config/blob/main/conventions/STRUCTURE-DEPOT.md)
   — l'arborescence et le squelette de `CLAUDE.md`, communs aux huit dépôts.
 - [ADR 0001 de Hubperso](https://github.com/MoKarade/Hubperso/blob/main/docs/adr/) — le
