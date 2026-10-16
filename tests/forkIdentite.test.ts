@@ -1,4 +1,4 @@
-// tests/forkIdentite.test.ts — verrouille l'étape 1 de la checklist de fork (CLAUDE.md § 11).
+// tests/forkIdentite.test.ts — verrouille l'étape 1 de la checklist de fork (docs/claude/11-fork.md).
 //
 // Le piège : un fork qui garde `APP.id = "app-template"` publie un summary valide, le gate est
 // vert, et rien ne dit que l'app n'est pas déclarée dans `lib/sources.ts` du hub. L'oubli
@@ -111,7 +111,7 @@ describe("estLeSquelette (mécanisme d'exemption)", () => {
   });
 });
 
-describe("identité de l'app (checklist de fork, CLAUDE.md § 11, étape 1)", () => {
+describe("identité de l'app (checklist de fork, docs/claude/11-fork.md, étape 1)", () => {
   it("APP.id n'est plus la valeur d'exemple, sauf dans le squelette lui-même", async () => {
     const squelette = estLeSquelette({
       githubRepository: process.env.GITHUB_REPOSITORY,
@@ -130,7 +130,7 @@ describe("identité de l'app (checklist de fork, CLAUDE.md § 11, étape 1)", ()
       `APP.id vaut encore "${ID_EXEMPLE}" (app/hub/summary/route.ts). Un fork doit y mettre ` +
         `l'id de son app ET la déclarer dans lib/sources.ts du hub (+ HUB_TOKEN_<ID>) : sans ` +
         `cette déclaration, personne ne peut recevoir l'accès, et ça ressemble à un bug ` +
-        `d'autorisation. Voir CLAUDE.md § 11, étapes 1 et 3.`,
+        `d'autorisation. Voir docs/claude/11-fork.md, étapes 1 et 3.`,
     ).not.toBe(ID_EXEMPLE);
   });
 });

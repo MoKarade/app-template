@@ -3,8 +3,8 @@
 
    Repris de la direction visuelle de BatchChef (décision de Marc, 13/08/2026), avec UNE
    différence voulue : ici le thème suit le système (`prefers-color-scheme`), comme le dit
-   CLAUDE.md § 2. BatchChef a depuis choisi un thème sombre seul ; un fork qui veut la même
-   chose retire le bloc `@media` et passe `color-scheme` à `dark`.
+   docs/claude/02-conventions.md. BatchChef a depuis choisi un thème sombre seul ; un fork
+   qui veut la même chose retire le bloc `@media` et passe `color-scheme` à `dark`.
 
    Règles, verrouillées par tests/theme.test.ts :
    - Les couleurs vivent ICI, en variables hexadécimales, et nulle part ailleurs : aucune
