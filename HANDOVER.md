@@ -27,7 +27,7 @@ utile est donc : *qu'est-ce qu'un fork obtient aujourd'hui ?*
 | Ce qui part avec le fork | État |
 |---|---|
 | `GET /hub/summary` conforme au contrat, jeton en temps constant, `no-store` | ✅ branché |
-| Session du hub (Auth.js v5, `providers: []`) + middleware fail-closed | ✅ branché (15/10/2026, tâche #30 ; plus de client Google dans le fork) |
+| Session du hub (Auth.js v5, `providers: []`) + proxy fail-closed | ✅ branché (15/10/2026, tâche #30 ; plus de client Google dans le fork) |
 | Autorisation **par le hub** — deux étages, revérifiés à chaque lecture de session | ✅ branché (20/08/2026) |
 | Cookie de session partagé sur `.hubperso.com` | ✅ branché (20/08/2026) |
 | CI : gate (typecheck · lint · test · build) + job `audit` séparé | ✅ branché |

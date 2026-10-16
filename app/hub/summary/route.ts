@@ -13,7 +13,7 @@
 // atteint. C'est le même défaut que « la même règle dans quatre fichiers, trois états de
 // vérité », mais dans du code d'authentification.
 //
-// ⚠️ Cette route reste HORS du middleware d'authentification utilisateur : elle porte sa
+// ⚠️ Cette route reste HORS du proxy d'authentification utilisateur : elle porte sa
 // propre auth par jeton. Voir l'en-tête de `lib/authGuard.ts` — c'est le piège n°1 de ce
 // template, vécu en production.
 //

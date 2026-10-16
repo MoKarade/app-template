@@ -15,8 +15,8 @@
 - **No fake data** : `status: "building"` par défaut, aucune métrique inventée, pas de bloc `usage` sans coût réel.
 - **Échec fermé** : `x-hub-token` obligatoire (401), `HUB_TOKEN` absent → 503, comparaisons en temps constant, `no-store` sur `/hub/summary`, jamais de secret en dur.
 - **Accès à deux étages** : `AUTHORIZED_EMAIL` = propriétaire (sans réseau), les autres via `aAccesHub` ; jamais d'allowlist locale. Un refus ne se met JAMAIS en cache.
-- **L'app LIT la session du hub**, elle n'en crée pas. Contrôle rejoué à chaque lecture (`decideAcces`), `requireSession()` dans toute page et Server Action ; toute nouvelle route de données reste DERRIÈRE le middleware.
-- **`/hub/summary` reste HORS du middleware d'auth utilisateur** (il porte son jeton) ; verrou `tests/auth.test.ts`, à ne pas supprimer.
+- **L'app LIT la session du hub**, elle n'en crée pas. Contrôle rejoué à chaque lecture (`decideAcces`), `requireSession()` dans toute page et Server Action ; toute nouvelle route de données reste DERRIÈRE le proxy.
+- **`/hub/summary` reste HORS du proxy d'auth utilisateur** (il porte son jeton) ; verrou `tests/auth.test.ts`, à ne pas supprimer.
 - **`HUB_TOKEN` sert dans les deux sens** (entrant et sortant) ; aucun `appId` dans le corps. Période des coûts : `total`.
 - **Socle visuel** : couleurs en variables dans `app/globals.css` et nulle part ailleurs, clair et sombre, cibles ≥ 44 px, champs à 16 px ; verrou `tests/theme.test.ts`.
 - **Code** : TypeScript strict, pas de `any` silencieux, erreurs jamais avalées, fonctions pures d'un côté et I/O de l'autre. Planchers de version documentés dans `package.json` (clé `//`), jamais redescendus.
