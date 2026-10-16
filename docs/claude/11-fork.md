@@ -19,5 +19,7 @@
 5. **Si l'app a une base** : ajouter `"vercel-build": "npm run db:migrate && next build"`
    (Vercel l'utilise à la place de `build` quand il existe) OU appliquer les migrations au
    démarrage. Exigence de Marc : **ne jamais avoir à lancer une commande sur son PC**.
-6. Créer `HANDOVER.md` et `BACKLOG.md` dès la première session, et `docs/adr/` à la première
-   décision architecturale.
+6. Créer `HANDOVER.md` et `BACKLOG.md` (un renvoi vers les issues) dès la première session, et une
+   ADR dans `docs/adr/` à la première décision architecturale.
+7. Dans `.github/workflows/fumee.yml`, mettre l'adresse de production de l'app dans `url-base` et
+   créer le secret `HUB_TOKEN` du dépôt : la fumée sonde l'app après chaque déploiement de production.

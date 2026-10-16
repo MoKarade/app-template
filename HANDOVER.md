@@ -15,6 +15,7 @@
   (`auto-merge.yml` + `scripts/autoMerge.mjs`) est retiré. Les PR qui touchent `.github/`,
   `scripts/hooks/`, `qualite/`, `vercel.json`, `drizzle/` ou `.env*` restent fusionnées par Marc.
 - **CI** : tous les workflows tournent sur `ubuntu-latest` (machines GitHub, gratuites sur un dépôt public), depuis la bascule en public (16/10/2026, tâche #36) ; le robot du PC ne sert plus ce dépôt. ⚠️ Un fork **privé** n'a pas de minutes Actions gratuites : il doit rester public, ou rebrancher un runner à lui.
+- **Risque accepté** : alerte `braces` 3.0.3 (GHSA-vfj7-8cjw-p6xm, dépendance de développement, aucun correctif publié), tolérée par Marc le 16/10/2026 dans `osv-scanner.toml`, à réexaminer au 16/01/2027.
 - **En cours** : rien.
 - **Gel décidé par Marc le 14/10 : aucun nouveau travail sur les apps tant que le plan de
   réduction du temps des PR est en cours.**
@@ -36,6 +37,7 @@ utile est donc : *qu'est-ce qu'un fork obtient aujourd'hui ?*
 | Seule `main` se déploie sur Vercel, aucune préversion (`vercel.json`, verrou `tests/vercel.test.ts`) | ✅ branché (16/10/2026, tâche #41) |
 | Gate rouge tant que `APP.id` vaut encore `app-template` (`tests/forkIdentite.test.ts`) | ✅ branché (15/10/2026, tâche #24) |
 | `CLAUDE.md` de 60 lignes au plus, détail dans `docs/claude/` (`tests/claudeMd.test.ts`) | ✅ branché (16/10/2026, tâche #31) |
+| Contrôles communs de `MoKarade/.github` appelés par la CI : sécurité (`securite-commune`), grille de conformité (`conformite`, tableau dans le résumé du job) et fumée de production (`fumee.yml`, déclenchée par un déploiement : jamais ici, le squelette n'est pas déployé) | ✅ branché (16/10/2026, tâche #37) |
 | Fusion automatique par Mergify (`.mergify.yml`) | ✅ branché (15/10/2026) — voir « État au 15/10 » |
 | Interface, moteur métier, base de données | ❌ à construire après le fork |
 

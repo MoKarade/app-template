@@ -5,7 +5,7 @@
 | `README.md` | À quoi sert l'app, pour un lecteur extérieur. |
 | `CLAUDE.md` | Fichier racine, court, qui renvoie à ce dossier. Se charge à **chaque session** → il reste **court**. |
 | `HANDOVER.md` | L'état RÉEL : ce qui tourne, ce qui reste à poser. À lire en premier. |
-| `BACKLOG.md` | Ce qui est décidé mais pas fait. |
+| `BACKLOG.md` | Un renvoi vers les issues du dépôt, où vit ce qui est décidé mais pas fait (20 lignes au plus). |
 | `docs/adr/` | Décisions architecturales, `NNNN-slug.md`. |
 | `docs/*.md` | Documents thématiques. Les leçons détaillées vont ici, jamais dans `CLAUDE.md`. |
 

@@ -1,19 +1,9 @@
 # BACKLOG — app-template
 
-Ce qui est décidé mais pas fait. Un item peut être **périmé** (réglé ailleurs) : vérifier
-l'état réel avant de coder.
+Le backlog vit dans les **issues** du dépôt : <https://github.com/MoKarade/app-template/issues>.
+Ce fichier n'en garde qu'un renvoi (décision du 15/10/2026, plan de standardisation) : une liste tenue
+à deux endroits dit deux choses différentes au bout d'une semaine.
 
-## À faire
-
-_(rien pour l'instant)_
-
-## Fait
-
-- ~~[T-02] Un test qui verrouille la checklist de fork~~ — 15/10/2026, tâche #24 :
-  `tests/forkIdentite.test.ts` échoue tant que `APP.id` vaut `app-template` hors du dépôt du
-  squelette (exemption par identité du dépôt, pas par drapeau).
-- ~~[T-01] Renommer la branche par défaut en `main`~~ — fait (date non tracée ici) ;
-  constaté le 14/10/2026 : `origin/HEAD` → `main`.
-- ~~Brancher l'autorisation par le hub~~ — 20/08/2026, PR #4. Le template produisait des
-  apps qui ne participaient pas au modèle d'accès, sans que rien ne soit rouge.
-- ~~Aligner la structure sur la convention commune~~ — 20/08/2026.
+- Une tâche = une issue `niveau:tâche`, avec **Avant**, **Après** et **Fini quand**.
+- Ce qui est livré se lit dans `HANDOVER.md` (état réel) et dans l'historique git.
+- Au fork : garder ce renvoi, créer les issues de la nouvelle app dans SON dépôt.

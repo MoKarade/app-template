@@ -1,0 +1,26 @@
+name: Fumée de production
+
+# Après chaque déploiement de production réussi, sonde l'app EN LIGNE : une CI verte ne prouve pas que
+# le site répond. Le contrôle est le workflow commun de MoKarade/.github (plan de standardisation du
+# 15/10/2026, décision 5) ; ce fichier ne fait que l'appeler.
+#
+# Le squelette n'a pas de projet Vercel : aucun déploiement ne survient ici, ce workflow ne se déclenche
+# donc jamais dans app-template. Chaque FORK le garde et change l'URL ci-dessous (docs/claude/11-fork.md).
+# Contrôles (rouge si l'un échoue après 3 essais) : santé, summary refusé sans jeton, summary valide avec
+# le jeton, page de connexion. Le journal ne contient ni corps de réponse ni jeton.
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  fumee:
+    name: Fumée de production
+    if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Production'
+    uses: MoKarade/.github/.github/workflows/fumee.yml@main
+    with:
+      # À CHANGER au fork : l'adresse de production de la nouvelle app.
+      url-base: https://app-template.hubperso.com
+    secrets:
+      hub-token: ${{ secrets.HUB_TOKEN }}
