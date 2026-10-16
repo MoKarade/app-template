@@ -1,4 +1,9 @@
-// middleware.ts
+// proxy.ts
+//
+// Anciennement `middleware.ts` : Next 16 a renommé la convention en « proxy » (v16.0.0, le nom
+// `middleware` est déprécié). Source : https://nextjs.org/docs/app/api-reference/file-conventions/proxy
+// (§ « Migration to Proxy » et tableau « Version history »). Le proxy tourne par défaut sur le
+// runtime Node.js, et l'export par défaut est accepté ; la garde d'auth est inchangée.
 //
 // Garde global : l'app est PRIVÉE, rien n'est servi sans session valide. La décision est
 // déléguée à `decideGuard` (lib/authGuard.ts, testé unitairement) ; ce fichier ne fait que

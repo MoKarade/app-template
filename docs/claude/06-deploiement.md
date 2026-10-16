@@ -10,7 +10,7 @@ DriveAI et JobAI ont rattrapé au push suivant ; Hubperso et BatchChef n'en ont 
 commit d'en-têtes de sécurité est resté **cinq jours** en attente sans que personne ne le
 voie.
 
-Donc, après un merge qui change ce qui est SERVI (en-têtes, `next.config.mjs`, middleware,
+Donc, après un merge qui change ce qui est SERVI (en-têtes, `next.config.mjs`, proxy (ex-middleware),
 variables de build, routes) : vérifier qu'un déploiement de production a bien été créé et
 qu'il est `READY`, puis **contrôler l'effet sur la réponse réelle** — un en-tête se lit dans
 la réponse, il ne se déduit pas du fichier source.

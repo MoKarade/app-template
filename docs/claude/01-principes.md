@@ -11,8 +11,8 @@
   rien n'est servi. Comparaisons de jetons en **temps constant**. Jamais de secret en dur.
 - **`no-store` systématique** sur `/hub/summary` : un summary est un instantané.
 - **App privée par défaut.** Elle affiche des données personnelles → session du hub
-  (`providers: []`) + middleware fail-closed. Toute NOUVELLE route qui affiche des données
-  reste DERRIÈRE le middleware.
+  (`providers: []`) + proxy fail-closed. Toute NOUVELLE route qui affiche des données
+  reste DERRIÈRE le proxy.
 - **Qui a le droit d'entrer : DEUX ÉTAGES, pas un seul** (ADR 0001 du hub).
   `AUTHORIZED_EMAIL` **n'est PAS « la seule adresse admise »** — c'est le **propriétaire**,
   vérifié en premier et **sans réseau**, pour qu'une panne du hub ne puisse pas enfermer

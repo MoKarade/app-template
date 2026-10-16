@@ -1,6 +1,6 @@
 // lib/authGuard.ts
 //
-// Logique de garde du middleware, isolée en fonctions PURES : testable sans mocker tout
+// Logique de garde du proxy, isolée en fonctions PURES : testable sans mocker tout
 // NextAuth, et surtout LISIBLE — c'est ici que se décide ce qui est public.
 //
 // ⚠️⚠️ LE PIÈGE N°1 DE CE TEMPLATE, vécu en production par JobAI (« le défaut n°1 du
@@ -12,7 +12,7 @@
 //
 // Le symptôme est trompeur : l'app marche parfaitement dans un navigateur (tu es
 // connecté), seul le hub voit le problème. Ne jamais retirer `/hub/summary` de
-// `isPublicPath`, et ne jamais l'ajouter au matcher du middleware.
+// `isPublicPath`, et ne jamais l'ajouter au matcher du proxy.
 
 export type GuardDecision =
   | { type: "next" }
@@ -21,7 +21,7 @@ export type GuardDecision =
 
 /**
  * Routes accessibles SANS session utilisateur. Doit rester aligné avec le matcher du
- * middleware — les deux listes disent la même chose, à deux endroits différents.
+ * proxy — les deux listes disent la même chose, à deux endroits différents.
  */
 export function isPublicPath(pathname: string): boolean {
   // Endpoint du hub : gardé par x-hub-token, PAS par la session. Voir l'avertissement

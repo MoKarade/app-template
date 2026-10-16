@@ -2,7 +2,7 @@
 // Au fork, remplace-la par ta vraie interface.
 //
 // `requireSession()` est le patron de TOUTE page ou Server Action qui affiche ou écrit des
-// données : le middleware garde déjà la porte, mais une erreur de matcher suffirait à
+// données : le proxy garde déjà la porte, mais une erreur de matcher suffirait à
 // l'ouvrir en silence — deux gardes indépendantes, une seule à se tromper.
 
 import { requireSession } from "@/lib/session";

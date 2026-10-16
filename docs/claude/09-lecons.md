@@ -1,6 +1,6 @@
 ## 9. Leçons apprises
 
-**1. `/hub/summary` doit rester HORS du middleware d'auth utilisateur.**
+**1. `/hub/summary` doit rester HORS du proxy d'auth utilisateur.**
 Il porte sa propre auth (le jeton). S'il tombe sous le garde de session, le hub reçoit une
 redirection HTML vers `/login` au lieu du JSON → widget « injoignable » en permanence.
 Le symptôme est trompeur : l'app marche parfaitement dans ton navigateur (tu es connecté),
