@@ -3,14 +3,14 @@
 ## État au 15/10/2026
 
 - **Ce qui tourne** : rien n'est déployé (c'est un squelette). Branche par défaut : **`main`**
-  (mesuré : `git ls-remote --symref origin HEAD`). Pile au 15/10 (`package.json`) : Next.js
+  (mesuré : `git ls-remote --symref origin HEAD`). Pile au 16/10 (`package.json`) : Next.js
   16.3.5, Auth.js v5 bêta, Zod 4, Vitest 5, `@mokarade/hub-contract` épinglé sur le tag
-  `v1.4.0` (#33).
+  `v1.5.0` (#82).
 - **Livré depuis la dernière mise à jour de ce fichier** (d'après `git log`, dernier commit le
   24/09) : Node 24 + fusion automatique (#12), re-pin `v1.3.1` (#13), portes qualité S6 (#14),
   Next 15 → 16.3.5 (#19), Zod 3 → 4 (#18), Vitest 5 et couverture recalibrée (#20),
   mises à jour Dependabot (#15, #17), CI sur le runner du PC (#22), fusion par Mergify à la
-  place de l'auto-merge maison (#29), re-pin `v1.4.0` (#33).
+  place de l'auto-merge maison (#29), re-pin `v1.4.0` (#33), re-pin `v1.5.0` (#82, zod 4 dans le contrat).
 - **Fusion** : Mergify (`.mergify.yml`, depuis le 15/10, #29) ; l'auto-merge maison
   (`auto-merge.yml` + `scripts/autoMerge.mjs`) est retiré. Les PR qui touchent `.github/`,
   `scripts/hooks/`, `qualite/`, `vercel.json`, `drizzle/` ou `.env*` restent fusionnées par Marc.
