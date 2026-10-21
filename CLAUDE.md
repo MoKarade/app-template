@@ -9,6 +9,7 @@
 ## Commandes
 - `npm run dev` · `npm run test` · `npm run typecheck` · `npm run lint` · `npm run build` · `npm run portes`.
 - Gate avant commit : `npm run typecheck && npm run lint && npm run test && npm run build`. Détail : `docs/claude/04-commandes.md`, `05-verifications.md`.
+- Graphe de code (hooks et MCP `graphify` posés, 0 jeton) : `graphify query|affected|path|explain` avant de grepper ou lire plusieurs fichiers ; `graphify-out/wiki/index.md` pour la vue d'ensemble. Détail : `docs/claude/12-graphe-code.md`.
 
 ## Règles propres au dépôt (détail : `docs/claude/01-principes.md`)
 - **Contrat d'abord** : toute réponse de `/hub/summary` passe par le schéma du contrat ; le hub REJETTE ce qui dévie. `dataAsOf` ≠ `generatedAt`.
@@ -32,4 +33,4 @@
 Ancien numéro de section de ce fichier → `docs/claude/` :
 - § 1 principes → `01-principes` · § 2 conventions → `02-conventions` · § 3 git → `03-workflow-git` · § 4 commandes → `04-commandes` · § 5 vérifications → `05-verifications`
 - § 6 déploiement → `06-deploiement` · § 7 intégration hub → `07-hub` · § 8 documentation → `08-documentation` · § 9 leçons → `09-lecons`
-- § 10 style et compte-rendu → `10-style-compte-rendu` (copie lisible de la convention : `docs/COMPTE-RENDU.md`, non importée) · § 11 checklist de fork → `11-fork` · préambule → `00-preambule` · graphe de code local (essai, optionnel) → `12-graphe-code`
+- § 10 style et compte-rendu → `10-style-compte-rendu` (copie lisible de la convention : `docs/COMPTE-RENDU.md`, non importée) · § 11 checklist de fork → `11-fork` · préambule → `00-preambule` · graphe de code → `12-graphe-code`
