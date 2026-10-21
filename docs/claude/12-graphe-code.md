@@ -24,6 +24,9 @@
 - Ce que `grep` ne donne pas : `affected "X"` rend les importeurs transitifs ET les documents qui citent X, avec fichier:ligne. [Certain]
 - Les chiffres du document source (71,5x, -80 %, 76 % LongMemEval) viennent du fournisseur, sur d'autres corpus. [Probable]
 
+## Artefact `graphe` pour Hubperso (tâche MoKarade/.github#374, 21/10/2026)
+- `.github/workflows/graphe.yml` appelle le workflow commun de `MoKarade/.github` à chaque push sur `main` (et à la demande) : artefact Actions `graphe` (`graph.html` filtré de moins de 1 Mo et `meta.json`), conservé 90 jours. Job séparé, jamais un check requis. Détail du format : `docs/graphe-code.md` de `MoKarade/.github`.
+
 ## Retour arrière
 Supprimer `.claude/settings.json` (ou ses trois blocs), `.mcp.json`, `scripts/graphe.sh`, `.graphifyignore`, les deux lignes de `.gitignore` et la ligne de `CLAUDE.md`. Rien d'autre n'a été modifié.
 
