@@ -47,6 +47,19 @@ describe("POST /api/lia/ask", () => {
     expect(demanderAuHub.mock.calls[0]![0]).toEqual({ question: "Salut LIA", page: "/" });
   });
 
+  it("dit `proprietaire` au hub : vrai pour AUTHORIZED_EMAIL, faux pour un invité", async () => {
+    demanderAuHub.mockResolvedValue({ text: "ok" });
+    vi.stubEnv("AUTHORIZED_EMAIL", "marc@exemple.test");
+
+    await POST(requete(valide));
+    requireSession.mockResolvedValue({ email: "invite@exemple.test" });
+    await POST(requete(valide));
+
+    expect(demanderAuHub.mock.calls[0]![1]).toMatchObject({ proprietaire: true });
+    expect(demanderAuHub.mock.calls[1]![1]).toMatchObject({ proprietaire: false });
+    vi.unstubAllEnvs();
+  });
+
   it.each([
     ["JSON cassé", "{pas du json", 400],
     ["question vide", JSON.stringify({ question: "" }), 400],

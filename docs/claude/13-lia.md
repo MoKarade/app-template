@@ -15,7 +15,7 @@ navigateur ──POST /api/lia/ask──▶ app ──POST /api/lia/ask (x-hub-t
 | Pièce | Rôle |
 |---|---|
 | `lib/lia/contrat.ts` | Schémas Zod de la demande et de la réponse (pur) |
-| `lib/lia/demander.ts` | Appel serveur vers le hub : https, jeton en en-tête, délai 20 s, échec fermé |
+| `lib/lia/demander.ts` | Appel serveur vers le hub : https, jeton en en-tête, délai 35 s, échec fermé |
 | `app/api/lia/ask/route.ts` | Route derrière le proxy ET `requireSession()` ; corps ≤ 8 Ko ; 401 / 400 / 413 / 503 |
 | `lib/lia/client.ts` | Le `ask` du navigateur : parle à la route de l'app, jamais au hub |
 | `lib/lia/monter.ts` + `components/LiaMontee.tsx` | LIA n'est montée que pour une session admise (pas sur `/login`) |
@@ -23,6 +23,7 @@ navigateur ──POST /api/lia/ask──▶ app ──POST /api/lia/ask (x-hub-t
 ## Règles
 
 - **`HUB_TOKEN` identifie l'app chez le hub** (comme pour `/api/acces`) : aucun identifiant d'app dans le corps. Il ne sort jamais du serveur.
+- **`proprietaire`** : l'app envoie au hub `proprietaire: true` seulement si l'email de session égale `AUTHORIZED_EMAIL` (`estProprietaire`). Une app a des invités, MemoryAI jamais : sans ce champ MemoryAI répond 403, donc un invité n'interroge pas la mémoire de Marc.
 - **Échec fermé** : sans `HUB_TOKEN`, hub ou MemoryAI en panne, trop lents ou non conformes → 503, et LIA dit « indisponible ». Jamais de réponse inventée.
 - **Texte reçu du hub = donnée** : validé par Zod, affiché par `textContent` (jamais `innerHTML`).
 - **v1 : texte, puces et humeur seulement.** Les blocs composés (`blocks`) sont strippés ; l'app n'a pas de rendu pour eux.

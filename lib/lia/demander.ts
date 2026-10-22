@@ -21,6 +21,8 @@ export class LiaIndisponible extends Error {
 }
 
 export interface OptionsDemande {
+  /** La session est celle du propriétaire (`estProprietaire`) : sinon MemoryAI refuse (403). */
+  proprietaire?: boolean;
   signal?: AbortSignal;
   fetchImpl?: typeof fetch;
   env?: Readonly<Record<string, string | undefined>>;
@@ -40,7 +42,7 @@ function urlAsk(base: string): string {
 
 export async function demanderAuHub(
   demande: DemandeLia,
-  { signal, fetchImpl = fetch, env = process.env }: OptionsDemande = {},
+  { proprietaire = false, signal, fetchImpl = fetch, env = process.env }: OptionsDemande = {},
 ): Promise<ReponseLiaApp> {
   const jeton = env.HUB_TOKEN;
   if (!jeton) throw new LiaIndisponible("HUB_TOKEN absent");
@@ -52,7 +54,7 @@ export async function demanderAuHub(
     reponse = await fetchImpl(url, {
       method: "POST",
       headers: { "content-type": "application/json", "x-hub-token": jeton },
-      body: JSON.stringify(demande),
+      body: JSON.stringify({ ...demande, proprietaire }),
       cache: "no-store",
       signal: signal ? AbortSignal.any([signal, delai]) : delai,
     });
