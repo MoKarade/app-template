@@ -6,10 +6,12 @@
 // Seul POST est exporté : Next répond 405 aux autres méthodes.
 
 import { LiaIndisponible, demanderAuHub } from "@/lib/lia/demander";
-import { DemandeLia } from "@/lib/lia/contrat";
+import { DemandeLia, estProprietaire } from "@/lib/lia/contrat";
 import { NonAutorise, requireSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
+/** Le hub a 35 s (MemoryAI 30 s) pour répondre : la fonction doit survivre à ce délai. */
+export const maxDuration = 40;
 
 /** Une question de 2 000 caractères tient très en dessous. Plus gros = pas une question. */
 const CORPS_MAX_OCTETS = 8 * 1024;
@@ -18,8 +20,9 @@ const reponse = (corps: unknown, status: number) =>
   Response.json(corps, { status, headers: { "cache-control": "no-store" } });
 
 export async function POST(req: Request): Promise<Response> {
+  let email: string;
   try {
-    await requireSession();
+    ({ email } = await requireSession());
   } catch (erreur) {
     if (erreur instanceof NonAutorise) return reponse({ error: "unauthenticated" }, 401);
     throw erreur;
@@ -39,7 +42,10 @@ export async function POST(req: Request): Promise<Response> {
   if (!demande.success) return reponse({ error: "corps_invalide" }, 400);
 
   try {
-    return reponse(await demanderAuHub(demande.data, { signal: req.signal }), 200);
+    return reponse(await demanderAuHub(demande.data, {
+        proprietaire: estProprietaire(email, process.env.AUTHORIZED_EMAIL),
+        signal: req.signal,
+      }), 200);
   } catch (erreur) {
     if (erreur instanceof LiaIndisponible) return reponse({ error: "lia_indisponible" }, 503);
     throw erreur;

@@ -17,8 +17,17 @@ describe("demanderAuHub", () => {
     expect(url).toBe("https://hubperso.com/api/lia/ask");
     expect(init.method).toBe("POST");
     expect((init.headers as Record<string, string>)["x-hub-token"]).toBe("jeton-de-test");
-    expect(JSON.parse(init.body as string)).toEqual(demande);
+    expect(JSON.parse(init.body as string)).toEqual({ ...demande, proprietaire: false });
     expect(init.cache).toBe("no-store");
+  });
+
+  it("dit au hub si la session est celle du propriétaire (faux par défaut)", async () => {
+    const fetchImpl = ok({ text: "x" });
+    await demanderAuHub(demande, { fetchImpl, env, proprietaire: true });
+    await demanderAuHub(demande, { fetchImpl, env });
+    const corps = fetchImpl.mock.calls.map((c) => JSON.parse((c as unknown as [string, RequestInit])[1].body as string));
+    expect(corps[0]).toEqual({ ...demande, proprietaire: true });
+    expect(corps[1]).toEqual({ ...demande, proprietaire: false });
   });
 
   it("sans HUB_TOKEN : indisponible, et aucun appel réseau", async () => {

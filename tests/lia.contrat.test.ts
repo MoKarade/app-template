@@ -1,7 +1,7 @@
 // tests/lia.contrat.test.ts — le contrat entre l'app, le navigateur et le hub (pur).
 
 import { describe, expect, it } from "vitest";
-import { DemandeLia, QUESTION_MAX, ReponseLiaApp } from "../lib/lia/contrat";
+import { DemandeHub, DemandeLia, QUESTION_MAX, ReponseLiaApp, estProprietaire } from "../lib/lia/contrat";
 
 describe("DemandeLia", () => {
   it("accepte une question, rognée, avec la page courante", () => {
@@ -18,6 +18,25 @@ describe("DemandeLia", () => {
     ["absente", {}],
   ])("rejette une question %s", (_nom, corps) => {
     expect(DemandeLia.safeParse(corps).success).toBe(false);
+  });
+});
+
+describe("DemandeHub et estProprietaire", () => {
+  it("le saut app → hub exige `proprietaire` (booléen)", () => {
+    expect(DemandeHub.parse({ question: "ok", proprietaire: false })).toEqual({ question: "ok", proprietaire: false });
+    expect(DemandeHub.safeParse({ question: "ok" }).success).toBe(false);
+    expect(DemandeHub.safeParse({ question: "ok", proprietaire: "oui" }).success).toBe(false);
+  });
+
+  it.each([
+    ["marc@exemple.test", "marc@exemple.test", true],
+    ["  Marc@Exemple.TEST ", "marc@exemple.test", true],
+    ["invite@exemple.test", "marc@exemple.test", false],
+    ["marc@exemple.test", undefined, false],
+    ["marc@exemple.test", "  ", false],
+    ["", "", false],
+  ])("`%s` face à AUTHORIZED_EMAIL `%s` : %s", (email, attendu, rendu) => {
+    expect(estProprietaire(email, attendu)).toBe(rendu);
   });
 });
 
