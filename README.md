@@ -21,6 +21,7 @@ d'ici. Deux choses sont déjà branchées et testées :
 | Fichier | Rôle |
 |---|---|
 | `app/hub/summary/route.ts` | Endpoint du hub : 503 sans `HUB_TOKEN`, 401 sans jeton valide, `no-store`, summary `building` |
+| `app/api/lia/ask/route.ts`, `lib/lia/`, `components/LiaMontee.tsx` | LIA (`@mokarade/lia-ui`) : question relayée au hub (puis MemoryAI) avec `HUB_TOKEN`, route derrière la session, échec fermé (`docs/claude/13-lia.md`) |
 | `lib/hubToken.ts` | Comparaison de jeton en temps constant (SHA-256 + `timingSafeEqual`) |
 | `auth.ts` | Auth.js v5, `providers: []` (session du hub). **Deux étages** : le propriétaire (`AUTHORIZED_EMAIL`, sans réseau) puis le hub. Revérifié à chaque lecture de session |
 | `lib/decisionAcces.ts` | L'ordre des deux étages, écrit une fois (utilisé par `auth.ts` et `lib/session.ts`) |
@@ -83,6 +84,7 @@ Deux authentifications indépendantes, qui ne se recouvrent pas :
 |---|---|---|---|
 | **Hub → app** | le hub, server-side | header `x-hub-token` | 503 si `HUB_TOKEN` absent, 401 si invalide |
 | **Toi → app** | navigateur | session posée par le hub (connexion Google faite chez lui), puis autorisation demandée au hub | 503 si non configurée, redirection `/login` (→ hub) sinon |
+| **App → hub (LIA)** | l'app, server-side | `POST /api/lia/ask` avec le même `HUB_TOKEN` ; le hub relaie à MemoryAI | 503 côté navigateur, LIA dit « indisponible » |
 | **App → hub** | l'app, server-side | `POST /api/acces` avec le même `HUB_TOKEN` | `false` (échec fermé) — sauf le propriétaire, qui ne passe pas par là |
 
 ```bash
