@@ -15,10 +15,10 @@ describe("LiaMontee : réglages communs", () => {
     expect(source).not.toContain("humeurVisible");
   });
 
-  it("utilise lia-ui v0.14.0 ou plus récent (mouvement complet par défaut, pastille d'humeur du paquet)", () => {
+  it("utilise lia-ui v0.15.0 ou plus récent (mouvement complet par défaut, pastille d'humeur du paquet)", () => {
     const m = /"@mokarade\/lia-ui": "github:MoKarade\/lia-ui#v(\d+)\.(\d+)\.(\d+)"/.exec(paquet);
     expect(m, "l'épingle de lia-ui doit être un tag vX.Y.Z").not.toBeNull();
     const [major = 0, minor = 0, patch = 0] = (m ?? []).slice(1).map(Number);
-    expect(major > 0 || minor > 14 || (minor === 14 && patch >= 0)).toBe(true);
+    expect(major > 0 || minor > 15 || (minor === 15 && patch >= 0)).toBe(true);
   });
 });

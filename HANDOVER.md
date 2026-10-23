@@ -16,7 +16,7 @@
   `scripts/hooks/`, `qualite/`, `vercel.json`, `drizzle/` ou `.env*` restent fusionnées par Marc.
 - **CI** : tous les workflows tournent sur `ubuntu-latest` (machines GitHub, gratuites sur un dépôt public), depuis la bascule en public (16/10/2026, tâche #36) ; le robot du PC ne sert plus ce dépôt. ⚠️ Un fork **privé** n'a pas de minutes Actions gratuites : il doit rester public, ou rebrancher un runner à lui.
 - **Risque accepté** : alerte `braces` 3.0.3 (GHSA-vfj7-8cjw-p6xm, dépendance de développement, aucun correctif publié), tolérée par Marc le 16/10/2026 dans `osv-scanner.toml`, à réexaminer au 16/01/2027.
-- **LIA (22/10/2026)** : `@mokarade/lia-ui` branché, épinglé sur v0.14.0 depuis le 23/10/2026 (même mouvement et même pastille d'humeur que le hub, réglages du paquet ; verrou `tests/liaMontee.test.ts`) (route `/api/lia/ask`, `lib/lia/`, layout). Sans la route `POST /api/lia/ask` du hub (qui relaie à MemoryAI), LIA vit mais répond « indisponible » (échec fermé). Détail : `docs/claude/13-lia.md`.
+- **LIA (22/10/2026)** : `@mokarade/lia-ui` branché, épinglé sur v0.15.0 depuis le 23/10/2026 (même mouvement et même pastille d'humeur que le hub, réglages du paquet ; verrou `tests/liaMontee.test.ts`) (route `/api/lia/ask`, `lib/lia/`, layout). Sans la route `POST /api/lia/ask` du hub (qui relaie à MemoryAI), LIA vit mais répond « indisponible » (échec fermé). Détail : `docs/claude/13-lia.md`.
 - **En cours** : rien.
 - **Gel décidé par Marc le 14/10 : aucun nouveau travail sur les apps tant que le plan de
   réduction du temps des PR est en cours.**
