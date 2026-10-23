@@ -2,7 +2,7 @@
 
 LIA, l'assistant de Marc, vit chez **MemoryAI** (cerveau, mémoire, outils). Chaque app ne fait que
 l'afficher et lui relayer les questions **par le hub**, seul détenteur des jetons (MemoryAI ne détient aucun jeton d'app). Le corps (traits en canvas, vie propre, chat au clic,
-menu au clic droit) vient du paquet `@mokarade/lia-ui`, épinglé **par tag** (`github:MoKarade/lia-ui#v0.13.0`),
+menu au clic droit) vient du paquet `@mokarade/lia-ui`, épinglé **par tag** (`github:MoKarade/lia-ui#v0.14.0`),
 jamais par branche, jamais publié sur npm. Mise à jour = changer le tag, comme `hub-contract`.
 
 ## Chemin d'une question
@@ -28,7 +28,7 @@ navigateur ──POST /api/lia/ask──▶ app ──POST /api/lia/ask (x-hub-t
 - **Texte reçu du hub = donnée** : validé par Zod, affiché par `textContent` (jamais `innerHTML`).
 - **v1 : texte, puces et humeur seulement.** Les blocs composés (`blocks`) sont strippés ; l'app n'a pas de rendu pour eux.
 - **Pas d'actions** dans le menu du clic droit en v1 : LIA propose, le hub exécute (catalogue : `hub-contract#78`).
-- **Le mouvement et la pastille d'humeur sont ceux du paquet** (même LIA que le hub) : `quandMouvementReduit` vaut « complet » par défaut depuis lia-ui v0.10.0 et `humeurVisible` est vrai par défaut depuis v0.11.0 ; `LiaMontee` ne les passe pas, aucune pastille maison (verrou `tests/liaMontee.test.ts`, paquet ≥ v0.13.0).
+- **Le mouvement et la pastille d'humeur sont ceux du paquet** (même LIA que le hub) : `quandMouvementReduit` vaut « complet » par défaut depuis lia-ui v0.10.0 et `humeurVisible` est vrai par défaut depuis v0.11.0 ; `LiaMontee` ne les passe pas, aucune pastille maison (verrou `tests/liaMontee.test.ts`, paquet ≥ v0.14.0).
 - **Une seule LIA par page** : ne jamais monter `<Lia>` ailleurs que dans le layout.
 - L'URL est `NEXT_PUBLIC_HUB_URL` (déjà utilisée par `accesHub.ts`, défaut `https://hubperso.com`) ; `http:` est refusé.
 - ⚠️ Un fork avec une **CSP** doit autoriser les styles que le paquet injecte (`style-src`), sinon LIA s'affiche sans habillage.
