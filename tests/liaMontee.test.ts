@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 const source = readFileSync(join(__dirname, "..", "components", "LiaMontee.tsx"), "utf8");
 const paquet = readFileSync(join(__dirname, "..", "package.json"), "utf8");
 const layout = readFileSync(join(__dirname, "..", "app", "layout.tsx"), "utf8");
+const globalError = readFileSync(join(__dirname, "..", "app", "global-error.tsx"), "utf8");
 
 function sources(dossier: string): string[] {
   return readdirSync(join(__dirname, "..", dossier), { recursive: true, encoding: "utf8" })
@@ -37,14 +38,26 @@ describe("LiaMontee : LIA présente tout le temps (demarrerLia)", () => {
 
   it("appelle demarrerLia au chargement du module (niveau racine, gardé par window), pas dans un effet ni un composant", () => {
     expect(source).toMatch(/^if \(typeof window !== "undefined"\) \{\n {2}demarrerLia\(/m);
-    expect(source).not.toContain("useEffect");
-    const composant = /export default function LiaMontee\(\) \{([\s\S]*?)\n\}/.exec(source);
+    expect(source.match(/demarrerLia\(/g)).toHaveLength(1);
+    // Le seul effet du composant lève le drapeau de session ; il ne démarre rien.
+    expect(/useEffect\(\(\) => \{[^}]*demarrerLia/.test(source)).toBe(false);
+    const composant = /export default function LiaMontee\([^)]*\{[^)]*\}[^)]*\) \{([\s\S]*?)\n\}/.exec(source);
     expect(composant, "composant LiaMontee introuvable").not.toBeNull();
     expect(composant?.[1]).not.toContain("demarrerLia");
   });
 
-  it("le layout racine rend LiaMontee (sinon le module n'est jamais chargé côté navigateur)", () => {
-    expect(layout).toContain("<LiaMontee />");
+  it("le layout racine rend LiaMontee TOUJOURS, session admise ou non (LIA aussi sur /login)", () => {
+    expect(layout).toContain("<LiaMontee session={lia} />");
+    expect(layout).not.toMatch(/\?\s*<LiaMontee/);
+  });
+
+  it("global-error.tsx rend LiaMontee : LIA reste là quand toute la page plante", () => {
+    expect(globalError).toContain("<LiaMontee />");
+  });
+
+  it("mode invité : ask passe par creerAskInvite, le drapeau de session se lève dans un effet seulement quand la session est admise", () => {
+    expect(source).toContain("creerAskInvite(session,");
+    expect(source).toMatch(/if \(admise\) session\.activer\(\)/);
   });
 
   it("aucun <Lia /> ni import de @mokarade/lia-ui/react dans l'app : une seule voie, une seule LIA par page", () => {

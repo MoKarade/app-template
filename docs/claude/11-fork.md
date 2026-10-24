@@ -32,6 +32,8 @@
 9. **LIA** : le squelette la démarre par `demarrerLia` (`@mokarade/lia-ui/boot`) appelé au chargement
    d'un module client rendu par le layout racine (`components/LiaMontee.tsx`), pas par `<Lia />` ni dans
    un effet : elle doit rester là même quand une page charge ou plante. Ne pas remonter `<Lia />` ailleurs
-   (une seule LIA par page). Routes sans LIA : `/login` et les routes qui ne rendent aucune page
-   (`/hub/summary`, `/api/*`) ; une page publique ajoutée au fork n'en a pas non plus. Détail et verrou :
+   (une seule LIA par page). Elle est présente sur TOUTES les pages, `/login` et `global-error.tsx`
+   compris : sans session admise elle est en mode invité (elle bouge, a une humeur, parle avec ses propres
+   phrases, mais son `ask` refuse avant tout réseau et elle dit « indisponible »). Seules les routes qui
+   ne rendent aucune page (`/hub/summary`, `/api/*`) n'en ont pas. Détail et verrou :
    `docs/claude/13-lia.md`, `tests/liaMontee.test.ts`.
