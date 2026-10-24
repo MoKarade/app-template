@@ -20,7 +20,7 @@
   "//jose": "Peer dependency OPTIONNELLE de @mokarade/hub-contract/session (^6.0.0) : requise seulement parce que lib/sessionAsymetrique.ts importe ce sous-chemin. Épinglée en direct plutôt que laissée en transitive de next-auth, qui n'en garantit pas la version.",
   "dependencies": {
     "@mokarade/hub-contract": "github:MoKarade/hub-contract#v1.5.0",
-    "@mokarade/lia-ui": "github:MoKarade/lia-ui#v0.37.2",
+    "@mokarade/lia-ui": "github:MoKarade/lia-ui#v0.38.0",
     "@sentry/nextjs": "^11.8.0",
     "jose": "^6.2.12",
     "next": "^16.4.2",
