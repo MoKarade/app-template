@@ -14,7 +14,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="fr-CA">
       <body>
         {children}
-        {lia ? <LiaMontee /> : null}
+        <LiaMontee session={lia} />
       </body>
     </html>
   );
