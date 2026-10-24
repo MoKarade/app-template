@@ -29,3 +29,9 @@
    workflow « Essai Sentry » (Actions > Essai Sentry > Run workflow) : il échoue si Sentry ne répond
    pas 2xx. Ne jamais mettre `sendDefaultPii` à vrai ni contourner `lib/sentryConfig.ts` : aucune
    donnée personnelle en ligne.
+9. **LIA** : le squelette la démarre par `demarrerLia` (`@mokarade/lia-ui/boot`) appelé au chargement
+   d'un module client rendu par le layout racine (`components/LiaMontee.tsx`), pas par `<Lia />` ni dans
+   un effet : elle doit rester là même quand une page charge ou plante. Ne pas remonter `<Lia />` ailleurs
+   (une seule LIA par page). Routes sans LIA : `/login` et les routes qui ne rendent aucune page
+   (`/hub/summary`, `/api/*`) ; une page publique ajoutée au fork n'en a pas non plus. Détail et verrou :
+   `docs/claude/13-lia.md`, `tests/liaMontee.test.ts`.
