@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 26/10/2026 — lia-ui remis à v0.38.0 (app-template#159)
+
+Dependabot (#155, fusionnée le 26/10 à 01:50Z) avait rétrogradé `@mokarade/lia-ui` de v0.38.0 à **v0.31.0** : il lit mal les tags, comme pour `@mokarade/hub-contract`. Re-pin à **v0.38.0** (commit `9faf1ac`, package.json et lockfile) et `@mokarade/lia-ui` ajouté aux `ignore` de `.github/dependabot.yml` : le re-pin se fait à la main à chaque version. Aucun changement de code.
+
 ## État au 15/10/2026
 
 - **Ce qui tourne** : rien n'est déployé (c'est un squelette). Branche par défaut : **`main`**
