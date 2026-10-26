@@ -38,7 +38,7 @@ describe("proxy.ts — le matcher", () => {
     expect(protege("/hub/summary")).toBe(false);
   });
 
-  it.each(["/", "/dossiers", "/api/donnees", "/hub/autre", "/api/lia/ask"])(
+  it.each(["/", "/dossiers", "/api/donnees", "/hub/autre", "/api/lia/ask", "/api/lia/etat", "/api/lia/etatX", "/api/lia/etat/x"])(
     "garde `%s`, route de données sans session = refusée",
     (chemin) => {
       expect(protege(chemin)).toBe(true);
@@ -50,6 +50,7 @@ describe("proxy.ts — le matcher", () => {
     "/dossiers",
     "/api/donnees",
     "/api/lia/ask",
+    "/api/lia/etat",
     "/hub/summary",
     "/login",
     "/api/auth/session",

@@ -55,6 +55,12 @@ describe("LiaMontee : LIA présente tout le temps (demarrerLia)", () => {
     expect(globalError).toContain("<LiaMontee />");
   });
 
+  it("l'état partagé passe par etatHttp, enveloppé pour l'invité, sans jeton ni en-tête écrit à la main", () => {
+    expect(source).toContain('import { etatHttp } from "@mokarade/lia-ui/etat-http"');
+    expect(source).toContain('creerEtatInvite(session, etatHttp("/api/lia/etat"))');
+    expect(source).not.toMatch(/HUB_TOKEN|x-hub-token|x-lia-proprietaire/i);
+  });
+
   it("mode invité : ask passe par creerAskInvite, le drapeau de session se lève dans un effet seulement quand la session est admise", () => {
     expect(source).toContain("creerAskInvite(session,");
     expect(source).toMatch(/if \(admise\) session\.activer\(\)/);

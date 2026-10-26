@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 26/10/2026 — LIA partage son état unique avec le hub, lia-ui v0.39.0 (app-template#158)
+
+Une seule LIA, un seul état (Marc, 23/10/2026) : le squelette démarrait LIA sans l'option `etat`, donc chaque fork repartait d'un état local, différent du hub. Ajouts : `GET|PUT /api/lia/etat` (`app/api/lia/etat/route.ts`, derrière le proxy ET `requireSession()`), qui relaie le `/api/lia/etat` du hub avec le cookie de session de l'utilisateur, jamais `HUB_TOKEN` (`lib/lia/etat.ts` jugement pur, `etatHub.ts` appel https, `hubCookie.ts` suit la redirection `hubperso.com` vers `www`, sinon Node perd le cookie). `LiaMontee` passe `etat: creerEtatInvite(session, etatHttp("/api/lia/etat"))` : un invité n'appelle rien. Pin **v0.39.0** (commit `5449056`) : `validerEtat` garde `discussion` (20 messages de 600 caractères, 4 000 au total, fermée = sans texte), donc la discussion de Marc suit d'une app à l'autre. Tests : `tests/lia.etat.test.ts`, `lia.hubCookie.test.ts`, `lia.askInvite.test.ts`, `liaMontee.test.ts`, `proxy.test.ts` (la route reste gardée). Aucun déploiement : un squelette ne se déploie pas.
+
 ## 26/10/2026 — lia-ui remis à v0.38.0 (app-template#159)
 
 Dependabot (#155, fusionnée le 26/10 à 01:50Z) avait rétrogradé `@mokarade/lia-ui` de v0.38.0 à **v0.31.0** : il lit mal les tags, comme pour `@mokarade/hub-contract`. Re-pin à **v0.38.0** (commit `9faf1ac`, package.json et lockfile) et `@mokarade/lia-ui` ajouté aux `ignore` de `.github/dependabot.yml` : le re-pin se fait à la main à chaque version. Aucun changement de code.
@@ -20,7 +24,7 @@ Dependabot (#155, fusionnée le 26/10 à 01:50Z) avait rétrogradé `@mokarade/l
   `scripts/hooks/`, `qualite/`, `vercel.json`, `drizzle/` ou `.env*` restent fusionnées par Marc.
 - **CI** : tous les workflows tournent sur `ubuntu-latest` (machines GitHub, gratuites sur un dépôt public), depuis la bascule en public (16/10/2026, tâche #36) ; le robot du PC ne sert plus ce dépôt. ⚠️ Un fork **privé** n'a pas de minutes Actions gratuites : il doit rester public, ou rebrancher un runner à lui.
 - **Risque accepté** : alerte `braces` 3.0.3 (GHSA-vfj7-8cjw-p6xm, dépendance de développement, aucun correctif publié), tolérée par Marc le 16/10/2026 dans `osv-scanner.toml`, à réexaminer au 16/01/2027.
-- **LIA (22/10/2026)** : `@mokarade/lia-ui` branché, épinglé sur v0.38.0 depuis le 24/10/2026 (même mouvement et même pastille d'humeur que le hub, réglages du paquet ; verrou `tests/liaMontee.test.ts` ; LIA démarrée par `demarrerLia` hors du rendu ; présente aussi sur `/login` et `global-error` en mode invité, `ask` refusé sans session, 24/10/2026) (route `/api/lia/ask`, `lib/lia/`, layout). Sans la route `POST /api/lia/ask` du hub (qui relaie à MemoryAI), LIA vit mais répond « indisponible » (échec fermé). Détail : `docs/claude/13-lia.md`.
+- **LIA (22/10/2026)** : `@mokarade/lia-ui` branché, épinglé sur v0.39.0 depuis le 26/10/2026 (même mouvement et même pastille d'humeur que le hub, réglages du paquet ; verrou `tests/liaMontee.test.ts` ; LIA démarrée par `demarrerLia` hors du rendu ; présente aussi sur `/login` et `global-error` en mode invité, `ask` refusé sans session, 24/10/2026) (route `/api/lia/ask`, `lib/lia/`, layout). Sans la route `POST /api/lia/ask` du hub (qui relaie à MemoryAI), LIA vit mais répond « indisponible » (échec fermé). Détail : `docs/claude/13-lia.md`.
 - **En cours** : rien.
 - **Gel décidé par Marc le 14/10 : aucun nouveau travail sur les apps tant que le plan de
   réduction du temps des PR est en cours.**
