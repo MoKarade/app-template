@@ -21,7 +21,7 @@
   "dependencies": {
     "@mokarade/hub-contract": "github:MoKarade/hub-contract#v1.5.0",
     "@mokarade/lia-ui": "github:MoKarade/lia-ui#v0.38.0",
-    "@sentry/nextjs": "^11.8.0",
+    "@sentry/nextjs": "^11.9.0",
     "jose": "^6.2.13",
     "next": "^16.4.2",
     "next-auth": "^5.0.0-beta.31",
