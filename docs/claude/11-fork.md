@@ -35,5 +35,6 @@
    (une seule LIA par page). Elle est présente sur TOUTES les pages, `/login` et `global-error.tsx`
    compris : sans session admise elle est en mode invité (elle bouge, a une humeur, parle avec ses propres
    phrases, mais son `ask` refuse avant tout réseau et elle dit « indisponible »). Seules les routes qui
-   ne rendent aucune page (`/hub/summary`, `/api/*`) n'en ont pas. Détail et verrou :
-   `docs/claude/13-lia.md`, `tests/liaMontee.test.ts`.
+   ne rendent aucune page (`/hub/summary`, `/api/*`) n'en ont pas. Son état (humeur, envies, discussion) est celui du hub, relayé
+   par `/api/lia/etat` (derrière la session, sans `HUB_TOKEN`) : ne pas l'ajouter aux exclusions du proxy.
+   Détail et verrou : `docs/claude/13-lia.md`, `tests/liaMontee.test.ts`, `tests/lia.etat.test.ts`.
