@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 26/10/2026 — lia-ui v0.41.1, la bulle ne dépasse plus de l'écran (app-template#171)
+
+Le gabarit épingle `@mokarade/lia-ui` v0.41.1 (sha pelé `90dc7e7`), seul changement (`package.json`, lock). Le relevé du PC sur v0.41.0 montrait la bulle hors écran à l'ouverture et à l'arrivée de la réponse, puis un saut. v0.41.1 place sans glisser quand la taille ou l'écran change et fait grandir la bulle vers le haut dans la moitié basse. Rien à brancher. Sans déploiement (gabarit) : preuve par typecheck, tests et build sur le commit fusionné.
+
 ## 26/10/2026 — lia-ui v0.41.0, sources cliquables et chat en bulle lissée (app-template#166)
 
 Le gabarit épingle `@mokarade/lia-ui` v0.41.0 (sha pelé `4d0c6f9`), seul changement (`package.json`, lock). v0.40.0 : les marques `[→lien]` d'une réponse de LIA deviennent une ligne « Sources » de petits liens (https, sans identifiants). v0.41.0 : le chat ne se replace plus à chaque image, reste dans l'écran visible (clavier du téléphone compris), glisse vers sa place, ne bouge pas quand le texte arrive. Retours de Marc du 26/10 : « incompréhensible, trop de texte, pas de liens » et « clunky, ça bug quand ça sort de la page ». Rien à brancher côté app. Preuve : sans déploiement (le gabarit ne se déploie pas) ; `npm ci && npm run typecheck && npm run test` verts avec lia-ui en 0.41.0.
