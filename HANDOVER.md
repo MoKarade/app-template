@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 26/10/2026 — lia-ui v0.42.0, la hauteur de la bulle se révèle en douceur (app-template#177)
+
+Le gabarit épingle `@mokarade/lia-ui` v0.42.0 (sha pelé `cff04f4`), seul changement (`package.json`, lock). La bulle de v0.41.1 restait dans l'écran mais changeait de hauteur d'un coup à chaque réponse. v0.42.0 découvre la hauteur gagnée en 280 ms depuis le bord fixe, sans ombre coupée, et ne bouge rien avec `prefers-reduced-motion`. Rien à brancher. Sans déploiement (gabarit) : preuve par typecheck, tests et build sur le commit fusionné.
+
 ## 26/10/2026 — lia-ui v0.41.1, la bulle ne dépasse plus de l'écran (app-template#171)
 
 Le gabarit épingle `@mokarade/lia-ui` v0.41.1 (sha pelé `90dc7e7`), seul changement (`package.json`, lock). Le relevé du PC sur v0.41.0 montrait la bulle hors écran à l'ouverture et à l'arrivée de la réponse, puis un saut. v0.41.1 place sans glisser quand la taille ou l'écran change et fait grandir la bulle vers le haut dans la moitié basse. Rien à brancher. Sans déploiement (gabarit) : preuve par typecheck, tests et build sur le commit fusionné.
