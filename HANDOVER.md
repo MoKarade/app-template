@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 26/10/2026 — lia-ui v0.41.0, sources cliquables et chat en bulle lissée (app-template#166)
+
+Le gabarit épingle `@mokarade/lia-ui` v0.41.0 (sha pelé `4d0c6f9`), seul changement (`package.json`, lock). v0.40.0 : les marques `[→lien]` d'une réponse de LIA deviennent une ligne « Sources » de petits liens (https, sans identifiants). v0.41.0 : le chat ne se replace plus à chaque image, reste dans l'écran visible (clavier du téléphone compris), glisse vers sa place, ne bouge pas quand le texte arrive. Retours de Marc du 26/10 : « incompréhensible, trop de texte, pas de liens » et « clunky, ça bug quand ça sort de la page ». Rien à brancher côté app. Preuve : sans déploiement (le gabarit ne se déploie pas) ; `npm ci && npm run typecheck && npm run test` verts avec lia-ui en 0.41.0.
+
 ## 26/10/2026 — LIA partage son état unique avec le hub, lia-ui v0.39.0 (app-template#158)
 
 Une seule LIA, un seul état (Marc, 23/10/2026) : le squelette démarrait LIA sans l'option `etat`, donc chaque fork repartait d'un état local, différent du hub. Ajouts : `GET|PUT /api/lia/etat` (`app/api/lia/etat/route.ts`, derrière le proxy ET `requireSession()`), qui relaie le `/api/lia/etat` du hub avec le cookie de session de l'utilisateur, jamais `HUB_TOKEN` (`lib/lia/etat.ts` jugement pur, `etatHub.ts` appel https, `hubCookie.ts` suit la redirection `hubperso.com` vers `www`, sinon Node perd le cookie). `LiaMontee` passe `etat: creerEtatInvite(session, etatHttp("/api/lia/etat"))` : un invité n'appelle rien. Pin **v0.39.0** (commit `5449056`) : `validerEtat` garde `discussion` (20 messages de 600 caractères, 4 000 au total, fermée = sans texte), donc la discussion de Marc suit d'une app à l'autre. Tests : `tests/lia.etat.test.ts`, `lia.hubCookie.test.ts`, `lia.askInvite.test.ts`, `liaMontee.test.ts`, `proxy.test.ts` (la route reste gardée). Aucun déploiement : un squelette ne se déploie pas.
