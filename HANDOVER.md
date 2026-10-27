@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 27/10/2026 — lia-ui v0.42.1, la discussion la plus récente l'emporte (app-template#184)
+
+Le gabarit épingle `@mokarade/lia-ui` v0.42.1 (sha pelé `b8967ec`), seul changement (`package.json`, lock). Au montage, la discussion de l'onglet était datée « maintenant » et passait devant celle de l'état partagé : une question posée sur le hub ne se retrouvait pas dans CarAI. v0.42.1 range le vrai instant avec la discussion de l'onglet, et la plus récente gagne à la première lecture de l'état. Rien à brancher côté app. Preuve : déploiement Vercel de production `READY` sur le commit fusionné, puis relevé du PC (lia-ui#140).
+
 ## 26/10/2026 — lia-ui v0.42.0, la hauteur de la bulle se révèle en douceur (app-template#177)
 
 Le gabarit épingle `@mokarade/lia-ui` v0.42.0 (sha pelé `cff04f4`), seul changement (`package.json`, lock). La bulle de v0.41.1 restait dans l'écran mais changeait de hauteur d'un coup à chaque réponse. v0.42.0 découvre la hauteur gagnée en 280 ms depuis le bord fixe, sans ombre coupée, et ne bouge rien avec `prefers-reduced-motion`. Rien à brancher. Sans déploiement (gabarit) : preuve par typecheck, tests et build sur le commit fusionné.
