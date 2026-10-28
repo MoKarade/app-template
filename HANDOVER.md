@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 28/10/2026 : lia-ui v0.43.0, le clic droit de LIA marche partout (app-template#190, mission MoKarade/.github#575)
+
+Épingle `@mokarade/lia-ui` v0.43.0 (sha pelé `c0f1ff7`), seul changement (`package.json`, lock). Marc, 28/10/2026 : « faut qu'il marche partout ». Le clic droit (et l'appui long) de LIA s'ouvre maintenant sur le fond de page, dans une fenêtre modale `<dialog>.showModal()`, et même quand un gestionnaire de la page bloque le menu natif ; les champs de saisie gardent le menu du navigateur. Rien à brancher. Preuve : déploiement de production `READY` sur le commit fusionné, puis relevé du PC (lia-ui#147).
+
 ## 28/10/2026 — lia-ui v0.42.2, une discussion fermée ailleurs reste fermée (app-template#187)
 
 Le gabarit épingle `@mokarade/lia-ui` v0.42.2 (sha pelé `9852596`), seul changement (`package.json`, lock). v0.42.1 ne rapprochait la discussion de l'onglet de celle de l'état partagé qu'à la première lecture, et seulement si la partagée était ouverte : une discussion fermée sur le hub était réécrasée par celle, plus ancienne, d'un onglet. v0.42.2 rapproche à chaque lecture (la plus récente gagne, fermée ailleurs = fermée ici) et écrit toujours la plus récente des deux. Rien à brancher côté app. Preuve : déploiement Vercel de production `READY` sur le commit fusionné, puis relevé du PC (lia-ui#144).
