@@ -5,12 +5,19 @@ name: Boîte du Réacteur
 # commentaires). Un commentaire de github-actions[bot] la réveille : prouvé le
 # 15/10/2026 sur la boîte (PR brouillon permanente #58).
 # Déclenché par la routine Réacteur (workflow_dispatch), jamais par un événement.
+# Une boîte par dépôt (MoKarade/.github#750) : l'entrée facultative `boite` vise la PR brouillon permanente d'un dépôt (fil d'app abonné,
+# réveillé sans relais). Sans elle, la boîte commune du Coordinateur (#58). Une PR qui n'est pas un brouillon « Boîte du Réacteur » est refusée.
 on:
   workflow_dispatch:
     inputs:
       texte:
         description: "Motif du réveil (une ou deux lignes factuelles)"
         required: true
+        type: string
+      boite:
+        description: "Numéro de la PR boîte d'un dépôt (facultatif, 58 par défaut)"
+        required: false
+        default: "58"
         type: string
 
 permissions:
@@ -27,6 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TEXTE: ${{ inputs.texte }}
+          BOITE: ${{ inputs.boite }}
         run: |
           corps="$TEXTE"
           case "$corps" in
@@ -34,4 +42,15 @@ jobs:
             *) corps="RÉACTEUR : $corps" ;;
           esac
           corps="${corps:0:600}"
-          gh pr comment 58 --repo "$GITHUB_REPOSITORY" --body "$corps"
+          case "$BOITE" in
+            ''|*[!0-9]*) echo "::error::numéro de boîte invalide"; exit 1 ;;
+          esac
+          # Seule une PR brouillon intitulée « Boîte du Réacteur » reçoit un commentaire.
+          if [ "$BOITE" != "58" ]; then
+            titre="$(gh pr view "$BOITE" --repo "$GITHUB_REPOSITORY" --json title,isDraft --jq 'select(.isDraft) | .title')"
+            case "$titre" in
+              "Boîte du Réacteur"*) ;;
+              *) echo "::error::la PR $BOITE n'est pas une boîte du Réacteur en brouillon"; exit 1 ;;
+            esac
+          fi
+          gh pr comment "$BOITE" --repo "$GITHUB_REPOSITORY" --body "$corps"
