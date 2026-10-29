@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 29/10/2026 : l'onglet « Apps » de navigation entre apps (app-template#213, mission MoKarade/.github#846)
+
+`components/NavApps.tsx` (serveur, `<details>` natif, zéro JavaScript) liste les AUTRES apps du parc ; monté par `app/layout.tsx` seulement quand `navAppsAutorisee()` (`lib/navApps/monter.ts`, propriétaire `AUTHORIZED_EMAIL` seulement) est vrai. `APP_COURANTE` (même fichier) est l'id de l'app : une ligne à changer au fork. `vitest.config.ts` inclut maintenant les `.test.tsx`. Doc : `docs/claude/14-nav-apps.md`. Test : `tests/navApps.test.tsx`. Aucun déploiement : un squelette ne se déploie pas.
+
 ## 29/10/2026 : la liste des apps du parc, base de l'onglet de navigation (app-template#212, mission MoKarade/.github#846)
 
 `lib/appsDuParc.ts` expose `APPS_DU_PARC` (hub, FinanceAI, DriveAI, BatchChef, CarAI, JobAI, MemoryAI, figée) et `autresApps(courant)` (toutes sauf l'app courante ; un id inconnu lève une erreur). Rien n'est affiché : le composant d'onglet est la tâche suivante (#213) et les six apps copient ce fichier. Le hub est à `https://www.hubperso.com` (`https://hubperso.com` répond 308 vers `www`, lu le 29/10/2026). Doc : `docs/claude/14-nav-apps.md`. Test : `tests/appsDuParc.test.ts`. Aucun déploiement : un squelette ne se déploie pas. Reprise par un fil Claude : Jules n'avait ouvert aucune PR 48 min après la réservation.

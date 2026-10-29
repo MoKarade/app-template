@@ -13,3 +13,18 @@
 ## À un fork
 
 Copier `lib/appsDuParc.ts` et `tests/appsDuParc.test.ts` tels quels. L'id de l'app courante (une constante de `app/layout.tsx`, tâche app-template#213) se change en une ligne ; il doit être l'un des `AppId`.
+
+# L'onglet « Apps » (app-template#213)
+
+`components/NavApps.tsx` : une pastille « Apps » repliée en haut à droite ; dépliée, un bouton par AUTRE app du parc (liste de `autresApps`) et un pour le hub. Un clic ouvre l'app dans le même onglet. Composant serveur : un `<details>`/`<summary>` natif, zéro JavaScript, aucun état « en ligne » inventé, aucun `fetch`. Style : classes `.nav-apps*` de `app/globals.css`, jetons existants seulement (clair et sombre), cibles ≥ 44 px, texte 16 px.
+
+## Qui le voit
+
+`navAppsAutorisee()` (`lib/navApps/monter.ts`) : vrai seulement si la session est celle de `AUTHORIZED_EMAIL` (propriétaire, comparaison sans réseau, échec fermé). Un invité admis par le hub, une session absente ou la page de connexion : le composant n'est pas monté du tout. `app/layout.tsx` le monte avec `<NavApps courant={APP_COURANTE} />`.
+
+## Copier dans une app
+
+1. Copier `components/NavApps.tsx`, `lib/navApps/monter.ts`, `tests/navApps.test.tsx` et le bloc `.nav-apps*` de `app/globals.css` (avec `lib/appsDuParc.ts` déjà copié).
+2. **Adapter l'id courant** : `APP_COURANTE` dans `lib/navApps/monter.ts`, l'un des `AppId` (le squelette emprunte « carai »).
+3. **Adapter le montage** : dans le layout racine, `navAppsAutorisee()` à côté de la porte de session de l'app, puis `{navApps && <NavApps courant={APP_COURANTE} />}`.
+4. **Adapter la porte** : `requireSession()` de l'app et sa variable `AUTHORIZED_EMAIL`. Le test `tests/navApps.test.tsx` doit rester vert, y compris la prise en charge des `.tsx` dans `vitest.config.ts`.
