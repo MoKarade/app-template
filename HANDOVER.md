@@ -1,5 +1,9 @@
 # HANDOVER — app-template
 
+## 29/10/2026 : la liste des apps du parc, base de l'onglet de navigation (app-template#212, mission MoKarade/.github#846)
+
+`lib/appsDuParc.ts` expose `APPS_DU_PARC` (hub, FinanceAI, DriveAI, BatchChef, CarAI, JobAI, MemoryAI, figée) et `autresApps(courant)` (toutes sauf l'app courante ; un id inconnu lève une erreur). Rien n'est affiché : le composant d'onglet est la tâche suivante (#213) et les six apps copient ce fichier. Le hub est à `https://www.hubperso.com` (`https://hubperso.com` répond 308 vers `www`, lu le 29/10/2026). Doc : `docs/claude/14-nav-apps.md`. Test : `tests/appsDuParc.test.ts`. Aucun déploiement : un squelette ne se déploie pas. Reprise par un fil Claude : Jules n'avait ouvert aucune PR 48 min après la réservation.
+
 ## 28/10/2026 : lia-ui v0.43.0, le clic droit de LIA marche partout (app-template#190, mission MoKarade/.github#575)
 
 Épingle `@mokarade/lia-ui` v0.43.0 (sha pelé `c0f1ff7`), seul changement (`package.json`, lock). Marc, 28/10/2026 : « faut qu'il marche partout ». Le clic droit (et l'appui long) de LIA s'ouvre maintenant sur le fond de page, dans une fenêtre modale `<dialog>.showModal()`, et même quand un gestionnaire de la page bloque le menu natif ; les champs de saisie gardent le menu du navigateur. Rien à brancher. Preuve : déploiement de production `READY` sur le commit fusionné, puis relevé du PC (lia-ui#147).
