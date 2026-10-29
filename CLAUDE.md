@@ -33,4 +33,4 @@
 Ancien numéro de section de ce fichier → `docs/claude/` :
 - § 1 principes → `01-principes` · § 2 conventions → `02-conventions` · § 3 git → `03-workflow-git` · § 4 commandes → `04-commandes` · § 5 vérifications → `05-verifications`
 - § 6 déploiement → `06-deploiement` · § 7 intégration hub → `07-hub` · § 8 documentation → `08-documentation` · § 9 leçons → `09-lecons`
-- § 10 style et compte-rendu → `10-style-compte-rendu` (copie lisible de la convention : `docs/COMPTE-RENDU.md`, non importée) · § 11 checklist de fork → `11-fork` · préambule → `00-preambule` · graphe de code → `12-graphe-code` · LIA (assistant) → `13-lia`
+- § 10 style et compte-rendu → `10-style-compte-rendu` (copie lisible de la convention : `docs/COMPTE-RENDU.md`, non importée) · § 11 checklist de fork → `11-fork` · préambule → `00-preambule` · graphe de code → `12-graphe-code` · LIA (assistant) → `13-lia` · navigation entre apps → `14-nav-apps`
